@@ -20,46 +20,46 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("pipeline.log"),  # Log to file
-        logging.StreamHandler()  # Log to console
+        logging.FileHandler("pipeline.log"),
+        logging.StreamHandler() 
     ]
 )
 
 API_KEYS = {
-    "rag": "AIzaSyAy3O2OIn-p0i8Gwctbud3o9mR2jEHkgQA",
-    "base_llm": "AIzaSyCDIJ0SzNC3SqJDylSwNdUwWK9OXsom6_c",
-    "worker_agent": "AIzaSyDeH_wnfSqW_EG9rXl0farmmIZaiswl6oM",
-    "mcp_tool": "AIzaSyDeH_wnfSqW_EG9rXl0farmmIZaiswl6oM",
+    "rag": "<ADD API KEY>",
+    "base_llm": "<ADD API KEY>",
+    "worker_agent": "<ADD API KEY>",
+    "mcp_tool": "<ADD API KEY>",
 }
 
 def run_pipeline(handler_type: str, version: str, api_key: str):
     try:
         logging.info(f"🚀 Starting pipeline for {handler_type}")
 
-#         # Step 1: Registry
-#         logging.info(f"[{handler_type}] 🔧 Step 1: Registry")
-#         try:
-#             builder = RegistryBuilder(api_key=api_key)
-#             builder.build_registry(handler_type, version)
-#         except Exception as e:
-#             logging.error(f"[{handler_type}] ❌ Registry step failed: {e}")
-#             return
-#         time.sleep(30)
+        # Step 1: Registry
+        logging.info(f"[{handler_type}] 🔧 Step 1: Registry")
+        try:
+            builder = RegistryBuilder(api_key=api_key)
+            builder.build_registry(handler_type, version)
+        except Exception as e:
+            logging.error(f"[{handler_type}] ❌ Registry step failed: {e}")
+            return
+        time.sleep(30)
 
-#         # Step 2: Static Fields
-#         logging.info(f"[{handler_type}] 📦 Step 2: Static Fields")
-#         try:
-#             base_dir = Path(f"handler_registry_builder/handler_registries/{version}/{handler_type}")
-#             entries = load_registries(base_dir=base_dir, handler_type=handler_type)
-#             for item in entries:
-#                 entry = item['entry']
-#                 static_builder = StaticFieldsBuilder(entry, handler_type)
-#                 results = static_builder.build_structured_entries()
-#                 save_static_jsonl_files(handler_type, results, save_dir=f"./static_fields_builder/static_output/{version}")
-#         except Exception as e:
-#             logging.error(f"[{handler_type}] ❌ Static fields step failed: {e}")
-#             return
-#         time.sleep(30)
+        # Step 2: Static Fields
+        logging.info(f"[{handler_type}] 📦 Step 2: Static Fields")
+        try:
+            base_dir = Path(f"handler_registry_builder/handler_registries/{version}/{handler_type}")
+            entries = load_registries(base_dir=base_dir, handler_type=handler_type)
+            for item in entries:
+                entry = item['entry']
+                static_builder = StaticFieldsBuilder(entry, handler_type)
+                results = static_builder.build_structured_entries()
+                save_static_jsonl_files(handler_type, results, save_dir=f"./static_fields_builder/static_output/{version}")
+        except Exception as e:
+            logging.error(f"[{handler_type}] ❌ Static fields step failed: {e}")
+            return
+        time.sleep(30)
 
         # Step 3: Contextual Fields
         logging.info(f"[{handler_type}] 🧠 Step 3: Contextual Fields")

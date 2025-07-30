@@ -42,19 +42,15 @@ class DataValidator:
 
         self.input_filename = self.input_path.name
 
-        # Output directory
         base_output_dir = Path(f"./data_validation/validated_output/{version}")
         base_output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Merged valid+refined output at top level
         self.merged_valid_refined_path = base_output_dir / self.input_filename
         self.merged_valid_refined_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Metadata directory
         self.base_output_dir = base_output_dir / "metadata" / self.input_filename.replace(".jsonl", "").replace(".json", "")
         self.base_output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Subdirectories
         self.raw_output_dir = self.base_output_dir / "raw_output"
         self.raw_output_dir.mkdir(exist_ok=True)
 
@@ -193,7 +189,6 @@ Instructions to review and refine above INPUT_JSON :
                 candidates = parsed.get("response", {}).get("candidates", [])
                 for candidate in candidates:
                     text_block = candidate.get("content", {}).get("parts", [])[0].get("text", "")
-                    # Remove markdown json code blocks if present
                     if text_block.startswith("```"):
                         lines = text_block.splitlines()
                         if lines[0].strip().startswith("```json") or lines[0].strip() == "```":
@@ -205,13 +200,11 @@ Instructions to review and refine above INPUT_JSON :
             except Exception as e:
                 print(f"[WARN] Error parsing output line {line_num}: {e}")
 
-        # Save raw output for this batch
         raw_out_path = self.raw_output_dir / f"output_{batch_index}.jsonl"
         with raw_out_path.open("a", encoding="utf-8") as f:
             for obj in parsed_outputs:
                 f.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
-        # Categorize outputs
         categorized = {
             "VALID": [],
             "REFINED": [],
@@ -240,7 +233,6 @@ Instructions to review and refine above INPUT_JSON :
         append_jsonl(self.invalid_dir / f"invalid_{batch_index}.jsonl", categorized["INVALID"])
         append_jsonl(self.unknown_dir / f"unknown_{batch_index}.jsonl", categorized["UNKNOWN"])
 
-        # Write merged valid + refined to top-level merged file
         with self.merged_valid_refined_path.open("a", encoding="utf-8") as f:
             for entry in categorized["VALID"] + categorized["REFINED"]:
                 try:
