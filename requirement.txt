@@ -1,0 +1,6 @@
+openai
+dotenv
+pandas
+openpyxl
+google-generativeai
+click
