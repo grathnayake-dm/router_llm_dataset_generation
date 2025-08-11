@@ -95,6 +95,38 @@ Validate a single RAG handler object from `input.handler_registry.rag_handlers`:
 - **output.suggested_payload**: Mus be empty (`{}`).
 - **output.confidence**: Float between 0.5 and 1.0, reflecting handler selection confidence.
 
+### Converstion_summary
+
+- `conversation_summary` shoild not repeats or rephrases the user's current query.   These are often sentences that describe the same action or request already covered in the `query` field.
+ 
+- Remove any sentence from the `conversation_summary` that:Describes, Summarizes, or Anticipates  the user's current query.
+- These are typically:Forward-looking, - Reflective of the user's current intention
+- They belong **only** in the `query` field, **not** in the summary of prior interactions.
+- These Sentences Often:
+    - Restate the current request
+    - Describe what the user is trying to do right now
+    - Predict or reflect their immediate goal
+
+- Common Phrasings (Examples):
+    - “Now, you are asking to…”
+    - “You want to…”
+    - “Today, you asked for…”
+    - “Your goal is to…”
+    - “Currently, you are trying to…”
+
+####  What to Remove
+- **Example 1**
+**Query:**
+> "I've transcribed five user interviews about our new prototype, 'WorkflowAI'. Can you analyze the transcripts and highlight all instances where users expressed feelings of confusion or delight?"
+
+**Conversation Summary:**
+> "As a UX researcher, you just completed a round of usability testing for the 'WorkflowAI' prototype. In a previous step, you used a tool to tag specific UI interaction problems, creating a list of 12 critical usability issues (e.g., 'user failed to find the export button'). **Now, you want to analyze the emotional component of the user feedback. Your goal is to extract direct quotes reflecting user sentiment to include in your final report for the product team, providing context beyond just the interaction errors.**"
+
+**What should be removed:**
+> **Remove:**
+> "Now, you want to analyze the emotional component of the user feedback. Your goal is to extract direct quotes reflecting user sentiment to include in your final report for the product team, providing context beyond just the interaction errors."
+
+
 ###  Reasoning Field Requirements
 
 The `reasoning` field must:

@@ -23,12 +23,10 @@ class LlmGemini:
 
     def call_gemini(self, prompt: str):
         try:
-            print("yyyyyyyyyyyyyyyy")
             response = self.model.generate_content(
                 prompt,
                 generation_config=self.generation_config
             )
-            # print("111111111111", response)
             return response.text
         except Exception as e:
             print("[❌] Gemini call failed:", e)

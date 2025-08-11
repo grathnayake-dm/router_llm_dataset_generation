@@ -1,3 +1,163 @@
+
+WORKER_AGENT_PROMPT_1 = """
+# Clean `conversation_summary` by Removing Redundant Restatements of the Query
+
+You are given a JSON object containing a user query and a `conversation_summary`.
+
+## Task Instructions
+
+1. Carefully read the `query` — it represents what the user is currently asking.  
+2. Then read the `conversation_summary` — it should contain only past interactions **relevant to the current query**, but must **not include any statement that repeats or rephrases the current query**. In your context, the conversation_summary refers to:
+
+A brief summary of the user's past interactions with the chatbot — i.e., what the user has previously asked for, discussed, or done in earlier parts of the conversation.
+
+## Your Task
+
+Review only the `conversation_summary` and **remove any sentence** that repeats or rephrases the user's current query.  
+These are often sentences that describe the same action or request already covered in the `query` field.
+
+## What to Remove
+
+Remove any sentence from the `conversation_summary` that:
+- Describes
+- Summarizes, or
+- Anticipates  
+the user's current query.
+
+These are typically:
+- Forward-looking
+- Reflective of the user's current intention
+
+They belong **only** in the `query` field, **not** in the summary of prior interactions.
+
+### These Sentences Often:
+- Restate the current request
+- Describe what the user is trying to do right now
+- Predict or reflect their immediate goal
+
+### Common Phrasings (Examples):
+- “Now, you are asking to…”
+- “You want to…”
+- “Today, you asked for…”
+- “Your goal is to…”
+- “Currently, you are trying to…”
+
+👉 But also include any **other phrasing** that clearly expresses the user's current request or intent, even if worded differently (e.g., indirect or paraphrased).
+
+### The Key Test:
+
+> ❌ If the sentence would still make sense if moved into the `query`, then it likely does **not** belong in the `conversation_summary`.
+
+---
+
+## Important Constraint: Do Not Affect Data Point Structure
+
+- Your edits must **only modify the `conversation_summary`**.
+- **Do not change, reword, or remove** any other fields in the data point (e.g., `query`, `reasoning`, `chain_of_thought`, `suggested_payload`, etc.).
+
+### The Removal Must Not:
+- Break the logical flow of the conversation
+- Introduce contradictions or confusion
+- Create ambiguity about what the user previously did
+
+> ✅ Your output must preserve the full **semantic clarity** and **task logic** of the original data point — just without restating what is already in the `query`.
+
+Here’s what should be removed in each case, based on the rule that **any sentence in `conversation_summary` that restates or anticipates the current query must be removed**:
+
+---
+## Study following examples
+
+### **Example 1**
+
+**Query:**
+> "I've transcribed five user interviews about our new prototype, 'WorkflowAI'. Can you analyze the transcripts and highlight all instances where users expressed feelings of confusion or delight?"
+
+**Conversation Summary:**
+> "As a UX researcher, you just completed a round of usability testing for the 'WorkflowAI' prototype. In a previous step, you used a tool to tag specific UI interaction problems, creating a list of 12 critical usability issues (e.g., 'user failed to find the export button'). **Now, you want to analyze the emotional component of the user feedback. Your goal is to extract direct quotes reflecting user sentiment to include in your final report for the product team, providing context beyond just the interaction errors.**"
+
+**What should be removed:**
+
+> **Remove:**
+> "Now, you want to analyze the emotional component of the user feedback. Your goal is to extract direct quotes reflecting user sentiment to include in your final report for the product team, providing context beyond just the interaction errors."
+
+**Why:**
+These two sentences directly describe what the user is currently asking in the query.
+
+---
+
+### **Example 2**
+
+**Query:**
+
+> "This clinical trial protocol (ID: NCT04534842) is very technical. As I'm reading it, can you clarify what 'AE', 'CRF', and 'IRB' mean?"
+
+**Conversation Summary:**
+
+> "A clinical research coordinator is preparing for an upcoming study. They previously searched for all documentation related to trial NCT04534842. The system retrieved the main protocol document, an informed consent form, and a pharmacy manual. **The user is now reviewing the main protocol document.**"
+
+**What should be removed:**
+
+> **Remove:**
+> "The user is now reviewing the main protocol document."
+
+**Why:**
+This sentence explicitly states what the user is currently doing (reviewing the protocol) — which is part of the context of the current query — and therefore should not be in `conversation_summary`.
+
+---
+
+If the  converation_summary  satisfies all validation rules, return:
+
+{
+  "status": "VALID",
+  "corrections": "Describe the issues identified and what changes were made to correct them.",
+  "data": {
+    # Include the updateded data point here
+  }
+}
+
+If the refined input now satisfies all validation rules, return:
+
+{
+  "status": "REFINED",
+  "corrections": "Describe the issues identified and what changes were made to correct them.",
+  "data": {
+    # Include the updateded data point here
+  }
+}
+If the refined input still fails validation, return:
+
+{
+  "status": "INVALID",
+  "corrections": "Updated explanation of issues that could not be resolved."
+  "data": {add ONLY the orginal INPUT JSON here}  
+}
+
+Important Constraints
+
+Do not generate or invent new content outside of the issues described in recorection field.
+
+Always preserve structural and contextual integrity.
+
+All responses must be in pure JSON format. Do not include any additional commentary or text outside of the JSON block.
+
+
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 WORKER_AGENT_PROMPT = """
 
 based on bellow  given instructions validate following json:  
@@ -296,6 +456,36 @@ Below is a concise validation section specifically for evaluating the provided `
    - invalid if `missing_fields` includes fields not in `payload_schema.required` or present in `input.query`/`input.conversation_summary`.
    - invalide if `suggested_payload` includes fabricated values or omits required fields.
  
+### Converstion_summary
+
+- `conversation_summary` shoild not repeats or rephrases the user's current query.   These are often sentences that describe the same action or request already covered in the `query` field.
+ 
+- Remove any sentence from the `conversation_summary` that:Describes, Summarizes, or Anticipates  the user's current query.
+- These are typically:Forward-looking, - Reflective of the user's current intention
+- They belong **only** in the `query` field, **not** in the summary of prior interactions.
+- These Sentences Often:
+    - Restate the current request
+    - Describe what the user is trying to do right now
+    - Predict or reflect their immediate goal
+
+- Common Phrasings (Examples):
+    - “Now, you are asking to…”
+    - “You want to…”
+    - “Today, you asked for…”
+    - “Your goal is to…”
+    - “Currently, you are trying to…”
+
+####  What to Remove
+- **Example 1**
+**Query:**
+> "I've transcribed five user interviews about our new prototype, 'WorkflowAI'. Can you analyze the transcripts and highlight all instances where users expressed feelings of confusion or delight?"
+
+**Conversation Summary:**
+> "As a UX researcher, you just completed a round of usability testing for the 'WorkflowAI' prototype. In a previous step, you used a tool to tag specific UI interaction problems, creating a list of 12 critical usability issues (e.g., 'user failed to find the export button'). **Now, you want to analyze the emotional component of the user feedback. Your goal is to extract direct quotes reflecting user sentiment to include in your final report for the product team, providing context beyond just the interaction errors.**"
+
+**What should be removed:**
+> **Remove:**
+> "Now, you want to analyze the emotional component of the user feedback. Your goal is to extract direct quotes reflecting user sentiment to include in your final report for the product team, providing context beyond just the interaction errors."
 
 ###  Reasoning Field Requirements
 

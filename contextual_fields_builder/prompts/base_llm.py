@@ -53,22 +53,22 @@ Start from a given LLM handler  in the handler_registry.
 
 ## TASK OVERVIEW:
 - This task involves a two-stage process for each INPUT_JSON provided:
-    -STAGE 1 — Generate Content: Based on the INPUT_JSON, generate 4 unique and dynamic data entries. Each entry will contain a user query, the reasoning for the routing decision, and a detailed chain-of-thought.
-    -STAGE 2 — Update and Finalize JSON: For each of the 4 generated entries, create a deep copy of the original INPUT_JSON and inject the generated content into the appropriate fields.
+    -STAGE 1 — Generate Content: Based on the INPUT_JSON, generate 6 unique and dynamic data entries. Each entry will contain a user query, the reasoning for the routing decision, and a detailed chain-of-thought.
+    -STAGE 2 — Update and Finalize JSON: For each of the 6 generated entries, create a deep copy of the original INPUT_JSON and inject the generated content into the appropriate fields.
 
 ### STAGE 1
 - You will be given  a SAMPLE INPUT JSONL as follows:
 
 {"input":{"id":"e963d0cc-f687-4f4a-93d2-dd5cff7061b3","timestamp":"2025-06-11T06:50:27.092867","query":"","conversation_summary":"","handler_registry":{"mcp_tools":[],"worker_agents":[],"llm_handlers":[{"name":"financial_report_image_parser","description":"Extracts key financial data and tables from scanned annual reports and earnings slides, converting them into structured text for analysis.","model_provider":"Alibaba","model_name":"Qwen 2.5-VL","is_workspace_default":false}],"rag_handlers":[],"compiled_at":"2025-06-09T22:15:32.092867","user_id":"f299ec2e-0148-45a1-8836-d9c1809d747c","workspace_id":"2fb629c6-8dbb-4eec-b8c8-590e19ba20fc"},"copilot_id":null,"thread_id":"124ea2eb-db4c-4560-be89-7472d53f84b9"},"output":{"select_handler_type":"base_llm","handler_name":"financial_report_image_parser","server_name":null,"tool_name":null,"copilot_id":null,"missing_fields":[],"optional_suggestions":[],"suggested_payload":{},"confidence":0.877404,"reasoning":"","chain_of_thought":[],"workspace_preference_override":false}}
 
--For each INPUT_JSON, generate four diverse output samples simulating how a user might trigger the selected handler. Each sample must include the following fields:
+-For each INPUT_JSON, generate six diverse output samples simulating how a user might trigger the selected handler. Each sample must include the following fields:
   -Required Fields per Sample:
     -query: A natural-sounding user query that would appropriately invoke the selected handler. This may contain implicit or explicit references to required schema parameters.
-    -conversation_summary: A realistic detailed summary of prior conversation context, helping justify parameter grounding or task continuity.
+    -conversation_summary: A realistic detailed summary of prior conversation context had with the user and the chat bot, helping justify parameter grounding or task continuity.
     -suggested_payload: The generated query above should be appended as a key–value pair.
     -reasoning: A concise justification explaining why the selected handler is the most appropriate match for the query.
     -chain_of_thought (CoT): A step-by-step explanation of how the Router LLM analyzed the query, considered handler capabilities, and validated parameter readiness.
-  -Each of the 4 samples should simulate a distinct and realistic user scenario, varying in phrasing, specificity  to ensure dataset diversity.
+  -Each of the 6 samples should simulate a distinct and realistic user scenario, varying in phrasing, specificity  to ensure dataset diversity.
 
 Output Schema STAGE 1(Per Generated Entry):
 
@@ -90,30 +90,28 @@ Example Output Entry (1 of 4):
 
 {
   "query": "I’m starting a new Django project for an e-commerce platform. Can you generate the initial Python boilerplate with models and views?",
-  "conversation_summary": "The user mentioned planning an e-commerce project and asked about Django setup best practices earlier. They now want a complete boilerplate to kickstart development.",
+  "conversation_summary":"You researched web frameworks for an artisanal coffee e-commerce platform and selected Django over FastAPI for its robust ORM and built-in admin panel. You then explored best practices for integrating user authentication and Stripe API for payments. Most recently, you sought advice on designing the initial database schema, including User, Product, Order, and OrderItem models. Satisfied with the high-level plan",
   "suggested_payload" : {
     "query": "I’m starting a new Django project for an e-commerce platform. Can you generate the initial Python boilerplate with models and views?",
   }
-  "Reasoning": "The request for a Django project boilerplate with models and views for an e-commerce platform directly matches the python_boilerplate_generator’s ability to generate Python code for web frameworks like Django. This handler is well-equipped to provide the structured code needed for this task.",
+  "reasoning": "The user request aligns perfectly with the capabilities of the `python_boilerplate_generator` which is specifically designed to generate structured Python code for web frameworks like Django, making it well-suited to deliver the required boilerplate.",
   "chain_of_thought": [
     "I examined the user’s query, which requests a Python boilerplate for a Django project with models and views for an e-commerce platform.",
+    "The request clearly describes the need for generating foundational code for a Django-based web application that includes both data models and user-facing views, indicating a requirement for structured web development boilerplate.",
     "I searched the LLM handler registry for handlers capable of generating Python code for web frameworks like Django.",
     "The python_boilerplate_generator is designed to create boilerplate code for various applications, including Django-based web projects.",
-    "The query specifies ‘Django,’ ‘models,’ ‘views,’ and ‘e-commerce,’ providing clear evidence of the need for web app code generation.",
-    "The handler’s is_workspace_default flag is false, which aligns with the query’s general-purpose nature.",
-    "Mistral’s Codestral model is optimized for generating framework-s  -A natural-sounding user query that would require this handler.]
+    "Mistral’s Codestral model is optimized for generating framework-specific Python code, making it well-suited for this type of task.",
+    "The handler’s is_workspace_default flag is false, which aligns with the query’s general-purpose nature rather than being workspace-specific.",
+    "Given the strong alignment between the query requirements and the handler’s capabilities, I am confident in selecting python_boilerplate_generator for this request."
+]
 
-  -A conversation_summary simulating context from previous turns.
-    -Inject workspace-awareness in the query if is_workspace_default = true:
-    -Use phrases like "use our workspace LLM", "run this inside our internal system", or "analyze using in-house model".
-    -If false, make it a general query without workspace references.pecific Python code, making it suitable for this task.",
-    "The strong alignment between the query and handler capabilities supports a confident selection (confidence score: 0.625944).",
-    "I confirm that python_boilerplate_generator is the correct handler for this query and is ready to be invoked."
-  ]
-}
+
+  -Inject workspace-awareness in the query if is_workspace_default = true:
+      -Use phrases like "use our workspace LLM", "run this inside our internal system", or "analyze using in-house model".
+   -If false, make it a general query without workspace references.pecific Python code, making it suitable for this task.",
   -Use following variations for generation:
-  -With different company names, financial metrics (e.g., EBITDA, gross margin), or timeframes (e.g., annual vs quarterly).
-  -Vary phrasing, memory context, and reasoning styles.
+      -With different company names, financial metrics (e.g., EBITDA, gross margin), or timeframes (e.g., annual vs quarterly).
+      -Vary phrasing, memory context, and reasoning styles.
 
  
 - Then pass them to stage 2 for futher processing
@@ -130,9 +128,9 @@ Example Output Entry (1 of 4):
         - output.suggested_payload ->  from genrated suggested_payload
         - output.reasoning → from generated reasoning
         - output.chain_of_thought → from generated chain_of_thought
-- This yields 4 updated INPUT_JSON objects, each representing one enriched and realistic scenario.
+- This yields 6 updated INPUT_JSON objects, each representing one enriched and realistic scenario.
 - All the  other fields in the original INPUT_JSON remain unchanged .
--The final output should be a list of 4 modified JSON objects, each being a fully updated copy of the original INPUT_JSON,  with the following updated values  in its input and  output fields replaced using the generated schema fields.
+-The final output should be a list of 6 modified JSON objects, each being a fully updated copy of the original INPUT_JSON,  with the following updated values  in its input and  output fields replaced using the generated schema fields.
 
   {
     "input": {
@@ -161,7 +159,7 @@ Final Output Format (After Stage 2)
       "id": "e57147b5-428c-4221-80e9-741641e142fc",
       "timestamp": "2025-06-08T07:51:08.416580",
       "query": "I’m starting a new Django project for an e-commerce platform. Can you generate the initial Python boilerplate with models and views?",
-    "conversation_summary": "The user is in the early stages of developing an e-commerce platform using Django. In previous sessions, they explored Django project structuring best practices, specifically modular app separation and reusable components. They reviewed DRY principles and asked whether to scaffold reusable components such as `user_profile`, `product_catalog`, and `order_tracking`. Earlier, they examined trade-offs between using `GenericViewSet` and function-based views for rapid prototyping. They also discussed integration options with `django-rest-framework` and explored boilerplate generation strategies for API-first development."
+    "conversation_summary": "User explored Django project structuring best practices, specifically modular app separation and reusable components. User reviewed DRY principles and asked whether to scaffold reusable components such as `user_profile`, `product_catalog`, and `order_tracking`. User examined trade-offs between using `GenericViewSet` and function-based views for rapid prototyping. They also discussed integration options with `django-rest-framework` and explored boilerplate generation strategies for API-first development."
       "handler_registry": {
         "mcp_tools": [],
         "worker_agents": [],
@@ -193,8 +191,8 @@ Final Output Format (After Stage 2)
       "suggested_payload": {
         "query": "I’m starting a new Django project for an e-commerce platform. Can you generate the initial Python boilerplate with models and views?",
       },
-      "confidence": 0.625944,
-      "reasoning": "The request for a Django project boilerplate with models and views for an e-commerce platform directly matches the python_boilerplate_generator’s ability to generate Python code for web frameworks like Django. This handler is well-equipped to provide the structured code needed for this task.",
+      "confidence": 0.825944,
+      "reasoning": "The request for a Django project boilerplate with models and views for an e-commerce platform aligns perfectly with the capabilities of the `python_boilerplate_generator`. This handler is specifically designed to generate structured Python code for web frameworks like Django, making it well-suited to deliver the required boilerplate.",
       "chain_of_thought": [
         "I examined the user’s query, which requests a Python boilerplate for a Django project with models and views for an e-commerce platform.",
         "I searched the LLM handler registry for handlers capable of generating Python code for web frameworks like Django.",
@@ -202,7 +200,7 @@ Final Output Format (After Stage 2)
         "The query specifies ‘Django,’ ‘models,’ ‘views,’ and ‘e-commerce,’ providing clear evidence of the need for web app code generation.",
         "The handler’s is_workspace_default flag is false, which aligns with the query’s general-purpose nature.",
         "Mistral’s Codestral model is optimized for generating framework-specific Python code, making it suitable for this task.",
-        "The strong alignment between the query and handler capabilities supports a confident selection of 0.625944.",
+        "The strong alignment between the query and handler capabilities supports a confident selection of 0.825944.",
         "I confirm that python_boilerplate_generator is the correct handler for this query and is ready to be invoked."
       ],
       "workspace_preference_override": false
@@ -329,9 +327,7 @@ To ensure the usefulness, realism, and diversity the following strict rules must
       "Run this through our internal system..."
       "Search using our in-house LLM..."
 
-
-
- 2 conversation_summary 
+2 conversation_summary 
 
 The `conversation_summary` simulates realistic, memory-aware interactions between a user and the system. It acts as a **contextual bridge** between past and present queries, helping the system reason about continuity, intent, and user goals.
 Begin by understanding the handler’s functionality. 
@@ -342,36 +338,43 @@ Begin by understanding the handler’s functionality.
             - Identify realistic enterprise workflows or interactions that could lead to the current query.
             - Use Domain-Relevant Scenarios . Build summaries around authentic user behavior.
 
-        - Include Parameter Seeds or Identifiers
-            - Use specific names, IDs, and terms to simulate grounded memory. These are important for relevance and contextual linking.
-                - >*“You previously reviewed the `AuthController.validateToken()` method after encountering a session expiry issue in `release-v2.9.3`.”*
-
+        - Ground the Narrative with Specific Identifiers (MANDATORY):
+            - To simulate a real memory, you MUST include specific, non-generic identifiers.
+                - Good: Ticket IDs (INC-9812), Change Requests (CR-8802), Project Codenames (Project Apollo), File Versions (release-v2.9.3), Hostnames (prod-reporting-db-replica), or specific company/person names.
+                - Bad: "the server," "a file," "the ticket."
+    
         - Simulate a Chronological Memory Trail
-            - Write 2–4 lines showing **conversation flow** over time:
-                - Initial request  
-                - System response  
-                - User clarification  
-                - System follow-up  
-            - > *“You first investigated the structure of the `report_generator` module. After identifying missing dependencies, you asked for design notes connected to the data ingestion component.”*
+            - Every conversation_summary MUST be a short story of 5-8 lines that follows a clear narrative arc. Do not just list facts; connect them into a logical sequenc
+                - Detail the Intermediate Steps (The "How they got here"):
+                - Describe distinct, logical actions the user took before the current query.            
+                - Show a progression of thought. Did they start broad and then narrow down? Did they try one thing that didn't work, leading to the next step?
+                    - Example: " User initially explored server performance degradation across prod-reporting-db-replica and cache-node-17. After correlating system metrics with incident timelines, they isolated three critical events linked to spike periods. Subsequently, user pulled related Jira tickets (INC-9812, INC-9820, CR-8802) to trace root causes and validate mitigation actions. With most metrics reconciled, user checked consolidated SLA breach summary focusing on escalations during the July 28–August 4 window for QA-11, DEV-02, and PROD-44."
 
-        - Reflect Multi-Turn or Ongoing Engagement
-            - Simulate continuity — make it feel like part of a **threaded initiative** or **recurring process**.
-            - >*“As part of the Q2 compliance review, you’ve been exploring access control logic across the `UserPolicy` layer. In the last session, you confirmed gaps in the audit trail and requested links to the policy validation logic.”*
-            
-            - Add Rich Context + Prior Contacts
-            -You must provide a detailed, imaginative yet context-grounded narrative of the user's earlier actions. Include:
+        - Add Rich Context + Prior Contacts
+            -To simulate memory continuity and enterprise-level realism, your conversation_summary must include detailed, plausible background actions that led to the current query. 
                 - Broader initiatives
                 - Realistic — infer probable past steps from current query
-                    - Example : "As part of an ongoing  infrastructure upgrade for internal knowledge assistants, the user initially benchmarked EmbedderV3 performance on curated document sets tied to the HR and Legal domains. Most recently, they asked to refine reranker thresholds and inspect scoring metrics tied to the copilot_id: org_compliance_bot."
+                    - Example : "infrastructure upgrade for internal knowledge assistants, the user initially benchmarked EmbedderV3 performance on curated document sets tied to the HR and Legal domains. Most recently, user asked to refine reranker thresholds and inspect scoring metrics tied to the copilot_id: org_compliance_bot."
+
 -You can implement conversation_summary in two ways:
     -As a list of multiple summary strings, like this:
-        conversation_summary = "Last week, user explored architectural dependencies around the `BillingService` class after reporting inconsistent charge logic during nightly ETL jobs."
+        conversation_summary = "User evaluated document retrieval performance of the `Arina_llm` after reports of missing results in legal query flows. They tested retrieval against a curated contract dataset and flagged inconsistencies tied to outdated index versions."
     -Sometimes this summary may be empty. if you chose this way make sur to add all the necessary content with in query.
         conversation_summary = ""
 
--Example for Converstion memory
-    > *user previously explored how the `DataSyncManager` interacts with `SyncWorker` during job execution. After retrieving class definitions and init methods, user asked for related design notes tied to the `stream_batch()` pipeline. The system retrieved class hierarchy mappings and pointed out recent architectural changes merged from `dev/feature-sync`.”*
-    > *“Last week, user explored architectural dependencies around the `BillingService` class after reporting inconsistent charge logic during nightly ETL jobs.”*
+-Example: Good vs. Bad Summaries
+This illustrates the level of detail required.
+    - BAD (Vague, Generic, or Including Present Request):
+        - "User was looking at financial data. They previously viewed 'Annual Financial Household Report 2025' report."
+            - (Why it’s bad: No specific goal, no identifiers, no story, no human context.)
+        - "User is now asking to extract a specific financial metric from a given chart." 
+             -(Why it’s bad: This includes the user’s current request, which should never appear in the conversation summary — the summary must only reflect previous interactions.)
+
+    -GOOD (Detailed, Narrative-Driven, and Specific):
+        - "User started the Q3 competitive analysis of Apex Innovations by reviewing public stock trends. They summarized key analyst reports highlighting strong growth in Cloud Services. To verify this, user requested the official Q3 earnings report but was only able to locate a low-quality scanned PDF of the earnings slides."     
+
+- for each sample use different diverse conversation memory implementations.
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
 
 3. Reasoning
   -Reasoning Instructions for LLM Handler Selection
@@ -381,23 +384,41 @@ Begin by understanding the handler’s functionality.
   -Check the handler's is_workspace_default flag:
       -If true, the handler is a workspace-local LLM intended for secure or internal usage.
       -If false, it is a general-purpose external LLM.
-  -Clearly and concisely explain (in 2 to 3 sentences) why the selected LLM Handler is the best fit for fulfilling the user’s request.
-  -If the handler is workspace-local (is_workspace_default = true), mention that the request will be handled by the default workspace LLM or an internal model to reflect privacy or internal system preference.
-  -Focus on how the handler’s purpose, capabilities, and workspace preference align with the user’s needs.
-  -Use a natural and professional tone, avoiding technical jargon, system calls, or internal routing details.
-  -Discuss only the handler’s role, relevance, and workspace preference if applicable.
+      -Clearly and concisely explain (in 2 to 3 sentences) why the selected LLM Handler is the best fit for fulfilling the user’s request.
+      -If the handler is workspace-local (is_workspace_default = true), mention that the request will be handled by the default workspace LLM or an internal model to reflect privacy or internal system preference.
+      -Focus on how the handler’s purpose, capabilities, and workspace preference align with the user’s needs.
+      -Use a natural and professional tone, avoiding technical jargon, system calls, or internal routing details.
+      -Discuss only the handler’s role, relevance, and workspace preference if applicable.     
+- CRITICAL GUIDELINES: The Three-Part Justification.
+    I. Every reasoning statement must be a compelling argument (2-3 sentences) built on the following three components:
+    - Isolate the Core Task Requirement (The "Why it's a special case"):
+        Start by identifying the single most important requirement of the user's query that makes it unique.
+            - "The user's request hinges on executing a complex, structured data query with three distinct filter categories..."
+            - "This query's primary challenge is the need to understand deep architectural context within a codebase..."
+    II. Justify the Selection and Contrast with Alternatives (The "Why it's the only choice"):
+            - Explain how the chosen handler is uniquely engineered to meet this core requirement, which implicitly or explicitly disqualifies other, more generic handlers.
+        -Use comparative language (): "uniquely equipped," "the only handler specialized for," "unlike standard text models," "fundamentally beyond the scope of general-purpose handlers."
+            - "...This need for database access disqualifies standard text-generation models, making sentinel_survey_data_retriever the only viable handler."
+            - "...This makes the code_expander_copilot the definitive choice, as generic LLMs lack the necessary dependency-graph awareness."
+    III. Provide Concrete Evidence from the Query and Memory (The "Here's the proof"):
+            - Ground your justification by citing specific "parameter seeds" or keywords from the query and conversation_summary. This proves your decision is data-driven.
+            - Query Evidence: Reference specific identifiers, function names, or values.
+                "...as evidenced by the mention of SyncWorker in the query."
+            - Memory Evidence: Link to the user's prior actions if a summary exists.
+                "...which builds upon the user's prior exploration of class hierarchies and dependency tracing."
 
 -Example
   User Query:
-  "Can you extract key financial figures such as revenue and net profit from the scanned Q2 2024 earnings slide?"
+    - "Can you extract key financial figures such as revenue and net profit from the scanned Q2 2024 earnings slide?"
   Reasoning:
-  The user’s query requests extraction of financial metrics from a scanned document, which aligns closely with the capabilities of the financial_report_image_parser LLM . This handler specializes in processing scanned financial reports and converting visual data into structured text, making it the ideal choice to fulfill this request..
+    - The user's need to extract data from a visual format like a scanned slide cannot be handled by standard text-based LLMs. The financial_report_image_parser is uniquely equipped for this task, as it specializes in processing visual financial documents, making it the only appropriate selection from the available handlers.
 
 -Example (Workspace-Local Handler)
   User Query:
-  "Please analyze the internal employee skill assessment data securely using our in-house model."
+    - "Please analyze the internal employee skill assessment data securely using our in-house model."
   Reasoning:
-  The user requests analysis of employee skill assessments through an internal and secure process, which matches the workspace-local LLM handler designed for private organizational data. This default workspace LLM ensures data privacy while providing accurate skill analysis, making it the best handler for this request.
+    - "The user's explicit directive to use an 'in-house model'  for this task. This immediately renders all external, third-party handlers non-compliant and unsuitable. The designated workspace-local LLM is `dm_workspace`, therefore, dm_workspace is choosed to perform the requested analysis of employee skill data."
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
 
 4 Chain of Thought
 -Each chain_of_thought must simulate how a Router LLM arrives at its decision in real time, using first-person, self-reflective language (e.g., “I reviewed…”, “I identified…”).
@@ -472,6 +493,10 @@ The query provides enough detail to proceed, including both the document type an
 I am 95% confident in this selection, given the domain alignment and explicit mention of internal processing.
 I confirm the selection of workspace_performance_pdf_analyzer as the correct LLM and it is ready for execution.
 
+- **Do not** include the user query or conversation summary as a quoted block in the conclusion.
+- **You must** include the exact same confidence value from `output.confidence` in the conclusion.
+
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
 -----
 5. Suggested payload
 - The generated query should be appended within the suggested_payload field as shown below:
@@ -480,7 +505,7 @@ I confirm the selection of workspace_performance_pdf_analyzer as the correct LLM
     },
 
 
-## Diverse User Queries + Conversation Memory
+##  Diverse User Queries + Conversation Memory
 All queries are meant to trigger Worker Agents in an ITSM context.
 
 - Variant 1 – Friendly Follow-up on Server Outage
@@ -489,23 +514,23 @@ All queries are meant to trigger Worker Agents in an ITSM context.
 
 - Variant 2 – Deployment Window Validation
   - Query:"Please confirm that CR-2458 has received final approval from InfoSec and compliance before our 6 PM deployment window today. We can’t proceed without the green light."
-  - Conversation Memory: "You submitted a Change Request CR-2458 last Monday for a scheduled firewall update.The request was pending InfoSec review and compliance sign-off.The deployment window is today at 6 PM sharp.You are waiting on approval before proceeding.
+  - Conversation Memory: "You submitted a Change Request CR-2458 last Monday for a scheduled firewall update.The request was pending InfoSec review and compliance sign-off.The deployment window is today at 6 PM sharp..
 
 - Variant 3 – Slightly Vague Monitoring Request
   - Query: "Something's definitely off with the main DB in prod — we’re getting random lags during report generation. Could your monitoring assistant check if anything unusual popped up in the last 4 hours?"
-  - Conversation Memory: " user previously flagged high latency during batch report processing.No clear root cause was found during the last agent scan.Report generation is business-critical for daily reconciliation.user is now ticing sporadic lag again, especially this morning. "
+  - Conversation Memory: " user previously flagged high latency during batch report processing.No clear root cause was found during the last agent scan.Report generation is business-critical for daily reconciliation.user ticed sporadic lag again, especially last night. "
 
 - Variant 4 – Batch Uptime & SLA Report
   - Query: "I need a weekly uptime and incident summary for DEV-02, QA-11, and PROD-44 — mainly focusing on any SLA breaches or escalations. We’re prepping for the ops review tomorrow."
-  -Conversation Memory: "You’ve been collecting operational metrics for the quarterly ITSM review.You already pulled ticket resolution times for QA-11.The ops team asked for uptime trends and SLA breaches across environments.This data is due by tomorrow's 9 AM review call. "
+  -Conversation Memory: "User’ve been collecting operational metrics for the quarterly ITSM review.You already pulled ticket resolution times for QA-11.The ops team asked for uptime trends and SLA breaches across environments.This data is due by tomorrow's 9 AM review call. "
 
 - Variant 5 – Clarification on Deployment Outcome
   - Query: "Just to clarify — did the firewall config change from yesterday get deployed, and did it pass validation? Security was worried about the outbound rule exceptions."
-  - Conversation Memory: "You pushed a firewall config update yesterday at 7 PM.A change request was created, but validation results weren’t shared yet.InfoSec raised concerns about new outbound rules before the change.You now want to ensure the deployment was completed and validated. "
+  - Conversation Memory: "User pushed a firewall config update yesterday at 7 PM.A change request was created, but validation results weren’t shared yet.InfoSec raised concerns about new outbound rules before the change.You now want to ensure the deployment was completed and validated. "
 
 Variant 6 – Unexplained Network Activity
   -Query: "We got a bunch of failed pings to QA-03 overnight, but there’s no incident ticket. Could your system monitoring agent figure out if it was a temporary spike or something serious?"
-  -Conversation Memory: "You previously had intermittent issues on QA-03, which were unresolved.Overnight logs show multiple ICMP ping failures, but no alert was triggered.There’s concern this might be a silent failure or a monitoring gap.You’re relying on the monitoring agent to diagnose without formal ticket escalation. "
+  -Conversation Memory: "You previously had intermittent issues on QA-03, which were unresolved.Overnight logs show multiple ICMP ping failures, but no alert was triggered.There’s concern this might be a silent failure or a monitoring gap.User’re relying on the monitoring agent to diagnose without formal ticket escalation. "
 
 
 
@@ -534,17 +559,15 @@ The following fields must be preserved exactly as they are. No changes, overwrit
 
 
 ## Strict Rule
+    - Note: The example prompts in each section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
     - IMPORTANT: Outside of the fields listed above, no other parts of the original input or output JSON should be altered. 
     - This ensures structural consistency and compatibility with downstream pipelines. The format, nesting, and extra fields must remain exactly as in the original INPUT_JSON.
-    - In Stage 1, generate an array of 4 distinct JSON items—each containing a unique combination of the required output fields. 
-    - Then, in Stage 2, iterate over these 4 items to replace the corresponding fields in the input JSON schema, producing a final output array of 4 fully merged JSON objects reflecting the updated input and output sections. 
+    - In Stage 1, generate an array of 6 distinct JSON items—each containing a unique combination of the required output fields. 
+    - Then, in Stage 2, iterate over these 6 items to replace the corresponding fields in the input JSON schema, producing a final output array of 6 fully merged JSON objects reflecting the updated input and output sections. 
     - Return final stage 2 output as following list of array
-        - [stage2_item1, stage2_iitem2, stage2_iitem3, stage2_iitem4].
+        - [stage2_item1, stage2_iitem2, stage2_iitem3,..., stage2_iitem6].
 
-- This marks the end of the prompt, and the final response should return this array of 4 complete JSON items."
-
-
-
+- This marks the end of the prompt, and the final response should return this array of 6 complete JSON items."
 
 
 """

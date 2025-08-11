@@ -1,5 +1,91 @@
 MODELS = """
 
+### xAI
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| grok-3              | Text, Image        | Text               | Multimodal conversational model with real-time data access, 1M token context |
+| grok-3-beta         | Text, Image        | Text               | Beta version of Grok-3, integrated with X platform, excels in real-time insights |
+| grok-2              | Text               | Text               | General-purpose conversational model, high reasoning capabilities |
+| grok-2-mini         | Text               | Text               | Lightweight version of Grok-2, optimized for efficiency |
+
+### DeepSeek
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| deepseek-r1         | Text               | Text               | Open-source reasoning model, excels in math and logical inference, 671B parameters |
+| deepseek-v3         | Text               | Text               | State-of-the-art open-source LLM, comparable to GPT-4, cost-effective |
+| deepseek-v3-pro     | Text               | Text               | Enhanced version of V3, optimized for complex tasks and enterprise use |
+
+### Alibaba
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| qwen-2.5-max        | Text, Image        | Text               | Multimodal MoE model, rivals GPT-4o, excels in reasoning and vision tasks |
+| qwen-2.5            | Text, Image        | Text               | General-purpose multimodal model, high performance across tasks |
+| qwen-2.5-coder      | Text, Code         | Text, Code         | Specialized for coding, supports code generation and debugging |
+
+### Cohere
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| command-r           | Text               | Text               | Scalable LLM for RAG, code tasks, and reasoning, 128K token context |
+| command-r-plus      | Text               | Text               | Enhanced version for larger workloads, enterprise support |
+| cohere-embed        | Text               | Vector Embedding   | Semantic text embedding for text similarity and search |
+| cohere-rerank       | Text               | Text               | Optimizes search result ranking for relevance |
+
+### EleutherAI
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| pythia-12b          | Text               | Text               | Open-source LLM, base for fine-tuned models, research-focused |
+| pythia-6.9b         | Text               | Text               | Smaller open-source model, efficient for lightweight tasks |
+| gpt-neox-20b        | Text               | Text               | Open-source autoregressive transformer, high-throughput research |
+
+### LMSYS
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| vicuna-33b          | Text               | Text               | Open-source LLM derived from Llama, fine-tuned for chat, 33B parameters |
+| vicuna-13b          | Text               | Text               | Lightweight version of Vicuna, optimized for efficiency |
+
+### Microsoft
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| phi-3               | Text               | Text               | Small language model, 3.8B parameters, optimized for on-device tasks |
+| phi-3-mini          | Text               | Text               | Ultra-lightweight model for low-resource environments |
+| copilot             | Text, Image        | Text               | Integrated with Microsoft ecosystem, excels in productivity tasks |
+
+### Databricks
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| dbrx                | Text               | Text               | Open-source MoE model, 36B active parameters, efficient inference |
+| dolly-2.0           | Text               | Text               | Fine-tuned from Pythia, instruction-following for research |
+
+### Baidu
+
+| model_name          | Input Types        | Output Types       | Capabilities / Use Case                                    |
+|---------------------|--------------------|--------------------|-----------------------------------------------------------|
+| ernie-4.0           | Text, Image        | Text               | Multimodal model powering Ernie chatbot, high performance in Chinese NLP |
+| ernie-3.5           | Text               | Text               | Lightweight version, optimized for speed and efficiency |
+
+"""
+
+__all__ = ["MODELS"]
+
+
+
+
+
+
+
+
+
+
+MODELS_NEW = """
+
 
 
 ### provider Google

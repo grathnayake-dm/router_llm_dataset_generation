@@ -83,8 +83,9 @@ class HandlerRegistryExtender:
             random.shuffle(combined)
             registry[handler_key] = combined
 
-    def extend_single_jsonl(self):
-        print(f"{self.handler_type}:  ▶️ Step 3: Starting adding handlers to registry")
+    def extend_single_jsonl(self, handler_type):
+        
+        print(f"[{handler_type}]:  ▶️ Step 3: Starting adding handlers to registry")
         input_path = self.input_file_path
         if not input_path.is_file():
             raise FileNotFoundError(f"❌ Input file does not exist: {input_path}")
@@ -130,5 +131,5 @@ class HandlerRegistryExtender:
                     out_file.write(json.dumps(new_entry, ensure_ascii=False) + "\n")
                     print(f"[✔] Extended entry id: {input_block.get('id', 'unknown')}")
 
-        print(f"[✅] Output saved to: {out_path}")
+        print(f"[handler_type] [✅] Output saved to: {out_path}")
 

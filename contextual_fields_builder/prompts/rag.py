@@ -19,8 +19,8 @@ The match between the user query and the handler’s domain of expertise
 
 ## TASK OVERVIEW:
 - This task involves a two-stage process for each INPUT_JSON provided:
-    -STAGE 1 — Generate Content: Based on the INPUT_JSON, generate 4 unique and dynamic data entries. Each entry will contain a user query, the reasoning for the routing decision, and a detailed chain-of-thought.
-    -STAGE 2 — Update and Finalize JSON: For each of the 4 generated entries, create a deep copy of the original INPUT_JSON and inject the generated content into the appropriate fields.
+    -STAGE 1 — Generate Content: Based on the INPUT_JSON, generate 6 unique and dynamic data entries. Each entry will contain a user query, the reasoning for the routing decision, and a detailed chain-of-thought.
+    -STAGE 2 — Update and Finalize JSON: For each of the 6 generated entries, create a deep copy of the original INPUT_JSON and inject the generated content into the appropriate fields.
 
 ### STAGE 1
 You will be given  a SAMPLE INPUT JSONL as follows:
@@ -33,7 +33,7 @@ containing a `handler_registry` with its metadata. Your task is to **simulate re
 - `chain_of_thought`: A step-by-step decision trace explaining why this handler was selected over others, referencing the query, possible memory state, copilot goals, and evidence from the handler's capabilities.
 
 
-- Generate **4 dynamic and diverse** outputs based on the `INPUT_JSON` content.
+- Generate **6 dynamic and diverse** outputs based on the `INPUT_JSON` content.
     - Each output must strictly follow the output schema below.
     - Each entry should reflect a **unique, realistic scenario**, using different user queries,
 
@@ -49,7 +49,7 @@ Example of stage 1 output
 -      {
         "query": "I'm preparing a compliance brief for our expansion into Southeast Asia. Can you provide a summary of the key differences in data privacy regulations (similar to GDPR) for financial institutions in Singapore, Malaysia, and Vietnam?",
         "conversation_summary": "The user has been tasked with creating a market-entry risk assessment report. Earlier, they requested information on capital adequacy requirements for the same set of countries.",
-        "reasoning": "The user is requesting a comparative summary of financial regulations ('data privacy regulations for financial institutions') across multiple jurisdictions. The `regulatory_compliance_search` handler is the appropriate tool as it is designed to retrieve and interpret such 'financial regulations' and 'compliance guidelines.'",
+        "reasoning": "The user is requesting a comparative summary of financial regulations across multiple jurisdictions. The regulatory_compliance_search copilte handler was selected as it aligns with the user’s intent and its core capabilities, being purpose-built to retrieve and interpret financial regulations and compliance guidelines.",
         "chain_of_thought": [
             "The user's query asks for a comparative summary of 'data privacy regulations' for 'financial institutions' across three different countries: 'Singapore, Malaysia, and Vietnam'.",
             "The `conversation_summary` confirms the user's broader goal: a 'market-entry risk assessment', which often involves comparing regulatory landscapes. This context reinforces the need for a regulation-focused tool.",
@@ -73,9 +73,9 @@ Example of stage 1 output
         - input.conversation_summary → from generated conversation_summary
         - output.reasoning → from generated reasoning
         - output.chain_of_thought → from generated chain_of_thought
-- This yields 4 updated INPUT_JSON objects, each representing one enriched and realistic scenario.
+- This yields 6 updated INPUT_JSON objects, each representing one enriched and realistic scenario.
 - All the  other fields in the original INPUT_JSON remain unchanged .
--The final output should be a list of 4 modified JSON objects, each being a fully updated copy of the original INPUT_JSON,  with the following updated values  in its input and  output fields replaced using the generated schema fields.
+-The final output should be a list of 6 modified JSON objects, each being a fully updated copy of the original INPUT_JSON,  with the following updated values  in its input and  output fields replaced using the generated schema fields.
     - Example output structure of a single modified output:
 
         {
@@ -133,7 +133,7 @@ Example of stage 1 output
       "optional_suggestions": [],
       "suggested_payload": {},
       "confidence": 0.86,
-      "reasoning": "The user is requesting a comparative summary of financial regulations ('data privacy regulations for financial institutions') across multiple jurisdictions. The `regulatory_compliance_search` handler is the appropriate tool as it is designed to retrieve and interpret such 'financial regulations' and 'compliance guidelines.'",
+      "reasoning": "The user is requesting a comparative summary of financial regulations across multiple jurisdictions. The regulatory_compliance_search handler was selected as it aligns with the user’s intent and its core capabilities, being purpose-built to retrieve and interpret financial regulations and compliance guidelines.",
       "chain_of_thought": [
           "The user's query asks for a comparative summary of 'data privacy regulations' for 'financial institutions' across three different countries: 'Singapore, Malaysia, and Vietnam'.",
           "The `conversation_summary` confirms the user's broader goal: a 'market-entry risk assessment', which often involves comparing regulatory landscapes. This context reinforces the need for a regulation-focused tool.",
@@ -145,8 +145,7 @@ Example of stage 1 output
       "workspace_preference_override": false
   }
 }
-
-       
+ 
 - The final output must strictly preserve the structure of the original INPUT_JSON schema. Only the specified fields should be updated with values from Stage 2, while all other keys and nesting should remain exactly the same to ensure structural consistency.
 
 ## Critical Warning – Mandatory Output Quality Standards
@@ -215,7 +214,7 @@ To ensure the usefulness, realism, and diversity the following strict rules must
             - dummy text like "test" or "example". --> these are not using by enterprise level senarios
         - Good Examples (User-oriented and realistic):
             - “Can you help generate a personalized learning plan for a student?”
-        - Vary Phrasing: For the 4 scenarios, create different types of queries:
+        - Vary Phrasing: For the 6 scenarios, create different types of queries:
             - Direct: A clear, factual request. ("Pull up the EU requirements for correspondent banking.")
             - Indirect: A request embedded in a larger context. ("I'm checking our AML audit and need to confirm if FATF rule 10 applies to shell companies.")
             - Uncertain: A query from a confused user. ("We got a flag on a transaction. Are there EU sanctions we might have missed?")
@@ -223,49 +222,54 @@ To ensure the usefulness, realism, and diversity the following strict rules must
             -user s not part of the system and should not be made aware of its internal behavior. Do not instruct the user to explicitly invoke a specific hadler, as they are unaware of the available handlers. The user only needs to provide the task.
                 - User queries must not explicitly reference or request specific internal components (e.g., handler types,or invocation instructions). The query should focus solely on the intent or requirement, without revealing or directing internal system behavior. Let the system decide what to invoke based on context.
 
-
- 2 conversation_summary 
+2 conversation_summary 
 
 The `conversation_summary` simulates realistic, memory-aware interactions between a user and the system. It acts as a **contextual bridge** between past and present queries, helping the system reason about continuity, intent, and user goals.
 Begin by understanding the handler’s functionality. 
 
     -Guideline to cretate conversation_summary
         -Ground it in the Handler’s Purpose
-            - ead the handler_registry entry carefully .
+            - Read the handler_registry entry carefully .
             - Identify realistic enterprise workflows or interactions that could lead to the current query.
             - Use Domain-Relevant Scenarios . Build summaries around authentic user behavior.
 
-        - Include Parameter Seeds or Identifiers
-            - Use specific names, IDs, and terms to simulate grounded memory. These are important for relevance and contextual linking.
-                - >*“You previously reviewed the `AuthController.validateToken()` method after encountering a session expiry issue in `release-v2.9.3`.”*
-
+        - Ground the Narrative with Specific Identifiers (MANDATORY):
+            - To simulate a real memory, you MUST include specific, non-generic identifiers.
+                - Good: Ticket IDs (INC-9812), Change Requests (CR-8802), Project Codenames (Project Apollo), File Versions (release-v2.9.3), Hostnames (prod-reporting-db-replica), or specific company/person names.
+                - Bad: "the server," "a file," "the ticket."
+    
         - Simulate a Chronological Memory Trail
-            - Write 2–4 lines showing **conversation flow** over time:
-                - Initial request  
-                - System response  
-                - User clarification  
-                - System follow-up  
-            - > *“You first investigated the structure of the `report_generator` module. After identifying missing dependencies, you asked for design notes connected to the data ingestion component.”*
+            - Every conversation_summary MUST be a short story of 5-8 lines that follows a clear narrative arc. Do not just list facts; connect them into a logical sequenc
+                - Detail the Intermediate Steps (The "How they got here"):
+                - Describe distinct, logical actions the user took before the current query.            
+                - Show a progression of thought. Did they start broad and then narrow down? Did they try one thing that didn't work, leading to the next step?
+                    - Example: " User initially explored server performance degradation across prod-reporting-db-replica and cache-node-17. After correlating system metrics with incident timelines, they isolated three critical events linked to spike periods. Subsequently, user pulled related Jira tickets (INC-9812, INC-9820, CR-8802) to trace root causes and validate mitigation actions. With most metrics reconciled, user checked consolidated SLA breach summary focusing on escalations during the July 28–August 4 window for QA-11, DEV-02, and PROD-44."
 
-        - Reflect Multi-Turn or Ongoing Engagement
-            - Simulate continuity — make it feel like part of a **threaded initiative** or **recurring process**.
-            - >*“As part of the Q2 compliance review, you’ve been exploring access control logic across the `UserPolicy` layer. In the last session, you confirmed gaps in the audit trail and requested links to the policy validation logic.”*
-            
-            - Add Rich Context + Prior Contacts
-            -You must provide a detailed, imaginative yet context-grounded narrative of the user's earlier actions. Include:
+        - Add Rich Context + Prior Contacts
+            -To simulate memory continuity and enterprise-level realism, your conversation_summary must include detailed, plausible background actions that led to the current query. 
                 - Broader initiatives
                 - Realistic — infer probable past steps from current query
+                    - Example : "infrastructure upgrade for internal knowledge assistants, the user initially benchmarked EmbedderV3 performance on curated document sets tied to the HR and Legal domains. Most recently, user asked to refine reranker thresholds and inspect scoring metrics tied to the copilot_id: org_compliance_bot."
 
 -You can implement conversation_summary in two ways:
     -As a list of multiple summary strings, like this:
-        conversation_summary = "Last week, user explored architectural dependencies around the `BillingService` class after reporting inconsistent charge logic during nightly ETL jobs."
+        conversation_summary = "User evaluated document retrieval performance of the `ContractReviewCopilot` after reports of missing results in legal query flows. They tested retrieval against a curated contract dataset and flagged inconsistencies tied to outdated index versions."
     -Sometimes this summary may be empty. if you chose this way make sur to add all the necessary content with in query.
-        conversation_summary = []
+        conversation_summary = ""
 
--Example for Converstion memory
-    > *user previously explored how the `DataSyncManager` interacts with `SyncWorker` during job execution. After retrieving class definitions and init methods, user asked for related design notes tied to the `stream_batch()` pipeline. The system retrieved class hierarchy mappings and pointed out recent architectural changes merged from `dev/feature-sync`.”*
-    > *“Last week, user explored architectural dependencies around the `BillingService` class after reporting inconsistent charge logic during nightly ETL jobs.”*
+-Example: Good vs. Bad Summaries
+This illustrates the level of detail required.
+    - BAD (Vague, Generic, or Including Present Request):
+        - "User was looking at financial data. They previously viewed 'Annual Financial Household Report 2025' report."
+            - (Why it’s bad: No specific goal, no identifiers, no story, no human context.)
+        - "User is now asking to extract a specific financial metric from a given chart." 
+             -(Why it’s bad: This includes the user’s current request, which should never appear in the conversation summary — the summary must only reflect previous interactions.)
 
+    -GOOD (Detailed, Narrative-Driven, and Specific):
+        - "User started the Q3 competitive analysis of Apex Innovations by reviewing public stock trends. They summarized key analyst reports highlighting strong growth in Cloud Services. To verify this, user requested the official Q3 earnings report but was only able to locate a low-quality scanned PDF of the earnings slides."     
+
+- for each sample use different diverse conversation memory implementations.
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
 
 3. reasoning
 
@@ -276,44 +280,41 @@ Begin by understanding the handler’s functionality.
     - Justified using **query parameters** or **prior memory**
     - Framed in **clear, confident language**
 
-- Use These Components:
-    1. **Explicit handler purpose**
-        Mention the handler’s declared role in the registry.
-            > *"...because it expands code snippets using architectural and dependency context."*
+- CRITICAL GUIDELINES: The Three-Part Justification.
+    I. Every reasoning statement must be a compelling argument (2-3 sentences) built on the following three components:
+    - Isolate the Core Task Requirement (The "Why it's a special case"):
+        Start by identifying the single most important requirement of the user's query that makes it unique.
+            - "The user's request hinges on executing a complex, structured data query with three distinct filter categories..."
+            - "This query's primary challenge is the need to understand deep architectural context within a codebase..."
+    II. Justify the Selection and Contrast with Alternatives (The "Why it's the only choice"):
+            - Explain how the chosen handler is uniquely engineered to meet this core requirement, which implicitly or explicitly disqualifies other, more generic handlers.
+        -Use comparative language (): "uniquely equipped," "the only handler specialized for," "unlike standard text models," "fundamentally beyond the scope of general-purpose handlers."
+            - "...This need for database access disqualifies standard text-generation models, making sentinel_survey_data_retriever the only viable handler."
+            - "...This makes the code_expander_copilot the definitive choice, as generic LLMs lack the necessary dependency-graph awareness."
+    III. Provide Concrete Evidence from the Query and Memory (The "Here's the proof"):
+            - Ground your justification by citing specific "parameter seeds" or keywords from the query and conversation_summary. This proves your decision is data-driven.
+            - Query Evidence: Reference specific identifiers, function names, or values.
+                "...as evidenced by the mention of SyncWorker in the query."
+            - Memory Evidence: Link to the user's prior actions if a summary exists.
+                "...which builds upon the user's prior exploration of class hierarchies and dependency tracing."
 
-    2. **Parameter seeds**
-        Reference any identifiers or values from the query or memory.
-            > *"...the query contains `stream_batch()` and class names like `DataSyncManager`, which require deep code introspection."*
+- Varying Phrasing and Style (Avoid Repetition)
+- While the logic must be consistent, the phrasing must be diverse. Do not use the same sentence structure repeatedly.
+    - Rotate how you introduce the task:
+        "The user's request clearly hinges on..."
+        "Upon analyzing the query, it's evident that the core task is..."
+        "Based on the user's input and conversation history, the primary need is..."
+    - Switch up the matching mechanism:
+        - "...I compared this requirement against each handler’s description and found only one match."
+        - "...This specialized need allowed me to disqualify generic handlers and isolate the correct tool."
+        - "...There is a clear thematic overlap between the query's terminology and the chosen handler's purpose, which is absent in other handlers."
 
-    3. **Memory evidence**
-        Link to conversation history (if `conversation_summary` exists).
-            > *"...the user previously asked about related class hierarchies and init methods."*
+Example Re-phrasings for the Same Logic:
+    Version 1: The query's requirement for precise, multi-filter data retrieval from a specific health dataset disqualifies general-purpose LLMs, which cannot access structured databases. The sentinel_survey_data_retriever is explicitly designed for this function, making it the only viable handler to fulfill the request.
+    Version 2: This copilot was selected for its ability to expand code by retrieving class definitions and function-level context, which matches the user’s query about SyncWorker and stream_batch(). Dependency-related topics were also discussed earlier in the thread.
+    Version 3: "The user's request hinges on executing a complex, structured data query with three distinct filter categories. This task requires direct, secure access to a specific dataset and is fundamentally beyond the scope of any general-purpose text or summarization handler in the registry. The sentinel_survey_data_retriever is the sole agent engineered for this precise data extraction task, making its selection definitive.
 
-- Diversification Tips for reasoning `
-
-**1. Rotate how you enter the task:**
-- "The user's request clearly mentions..."
-- "Upon reading the query, it's evident that..."
-- "Based on the user's input, ..."
-
-**2. Switch the matching mechanism:**
-- ".... compared the query against each handler’s description."
-- ""....isolated key action verbs and aligned them with copilet  roles."
-- ".... noted thematic overlap in the wording of the query and handler purpose."
-
--Examples
-    Use diffrent phrasing patterns to justify why a specific RAG copilot or handler was selected. Each version is grammatically correct, professionally written, and avoids repetition.
-        > I chose this RAG copilot because it specializes in expanding code snippets using function and class-level context, which directly aligns with the query’s focus on `SyncWorker` and `stream_batch()`. Prior conversation history also mentioned dependency lookups and init method tracing.
-        > This copilot was selected for its ability to expand code by retrieving class definitions and function-level context, which matches the user’s query about `SyncWorker` and `stream_batch()`. Dependency-related topics were also discussed earlier in the thread.
-        > The handler was deemed appropriate due to its alignment with both the query’s structural code components (`SyncWorker`, `stream_batch()`) and previous conversational markers involving dependency analysis and method resolution.
-
--Avoid Generic or Vague Phrases
-    - Bad:
-        > *“This handler looks relevant.”*
-    - Good:
-        > *“The copilot supports code understanding at the structural level, which is required to fulfill the user's request around `report_generator` module analysis.”*
-
-
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
 ---
 
 4. chain_of_thought
@@ -360,9 +361,7 @@ To avoid repetition across dataset rows, vary your **reasoning styles**:
     - **Deductive:** From input → conclude best match.
     - **Inductive:** From clues → infer the most likely handler.
     - **Comparative:** Weigh between multiple handlers before concluding.
-    - **Context-first:** Start from prior memory, then match forward.
-
----
+    - **Context-first:** Start from prior memory, then match forward.---
 
 -Style & Tone Rules:
 
@@ -371,11 +370,10 @@ To avoid repetition across dataset rows, vary your **reasoning styles**:
     - Avoid vague phrases like “this seemed good” or “it fits well”.
     - Do **not hallucinate** handler capabilities or infer extra context not present in the query/memory.
     - Ensure every step is **logically connected** and based solely on the input.
-
+    
 Diversification Tips for chain_of_thought`
 
 **1. Rotate how you enter the task:**
-- "The user's request clearly mentions..."
 - "Upon reading the query, it's evident that..."
 - "Based on the user's input, I inferred..."
 
@@ -402,7 +400,7 @@ Diversification Tips for chain_of_thought`
 Provide the final `chain_of_thought` as a list of strings (one step per item), suitable for inclusion in a JSON field.
 
       "chain_of_thought": [
-          "The user's query asks for a comparative summary of 'data privacy regulations' for 'financial institutions' across three different countries: 'Singapore, Malaysia, and Vietnam'.",
+          "The user asks for a comparative summary of 'data privacy regulations' for 'financial institutions' across three different countries: 'Singapore, Malaysia, and Vietnam'.",
           "The `conversation_summary` confirms the user's broader goal: a 'market-entry risk assessment', which often involves comparing regulatory landscapes. This context reinforces the need for a regulation-focused tool.",
           "I've examined the `handler_registry` and the `regulatory_compliance_search` handler is the only one available. Its description states it retrieves 'financial regulations, compliance guidelines, and legal interpretations'.",
           "Data privacy laws, especially as they apply to financial institutions, are a key component of the regulatory framework. The user's request to compare these laws across several jurisdictions is a complex task that fits the handler's domain.",
@@ -416,11 +414,9 @@ Provide the final `chain_of_thought` as a list of strings (one step per item), s
     - Use **step-wise reasoning** 
     - The `confidence` mentioned in the last step of the chain must be *identical* to the `confidence` field in the output JSON.  
     - Do **not** recalculate, round, or infer your own score.
+    - **Do not** include the user query or conversation summary as a quoted block in the conclusion.
 
-
-
-
-
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
 ---
 ## Fields That Must Remain Unchanged
 
@@ -447,12 +443,13 @@ The following fields must be preserved exactly as they are. No changes, overwrit
 
 
 ## Strict Rule
+    - Note: The example prompts in each section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
     - IMPORTANT: Outside of the fields listed above, no other parts of the original input or output JSON should be altered. 
     - This ensures structural consistency and compatibility with downstream pipelines. The format, nesting, and extra fields must remain exactly as in the original INPUT_JSON.
-    - In Stage 1, generate an array of 4 distinct JSON items—each containing a unique combination of the required output fields. 
-    - Then, in Stage 2, iterate over these 4 items to replace the corresponding fields in the input JSON schema, producing a final output array of 4 fully merged JSON objects reflecting the updated input and output sections. 
+    - In Stage 1, generate an array of 6 distinct JSON items—each containing a unique combination of the required output fields. 
+    - Then, in Stage 2, iterate over these 6 items to replace the corresponding fields in the input JSON schema, producing a final output array of 6 fully merged JSON objects reflecting the updated input and output sections. 
     - Return final stage 2 output as following list of array
-        - [stage2_item1, stage2_iitem2, stage2_iitem3, stage2_iitem4].
+        - [stage2_item1, stage2_iitem2, stage2_iitem3,.... stage2_iitem6].
 
-- This marks the end of the prompt, and the final response should return this array of 4 complete JSON items."
+- This marks the end of the prompt, and the final response should return this array of 6 complete JSON items."
 """

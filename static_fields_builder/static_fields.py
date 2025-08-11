@@ -67,7 +67,7 @@ class StaticFieldsBuilder:
         else:
             return False
 
-    def build_structured_entries(self,) -> List[dict]:
+    def build_structured_entries(self) -> List[dict]:
         print(f"{self.handler_type}: 📦 Step 2: Building static fields")
         results = []
         compiled_at, timestamp = self.generate_date_time()

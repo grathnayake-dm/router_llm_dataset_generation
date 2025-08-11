@@ -6,6 +6,11 @@ from pathlib import Path
 
 
 # step 01 save handler regsistries
+
+import os
+import re
+import json
+
 def save_handlers(handler_type: str, all_outputs: list, save_dir="handlers"):
     output_folder = os.path.join(save_dir, handler_type)
     os.makedirs(output_folder, exist_ok=True)
@@ -16,32 +21,75 @@ def save_handlers(handler_type: str, all_outputs: list, save_dir="handlers"):
 
         data = None
         if isinstance(raw_output, str):
+            # Clean markdown json fences and unescape newlines
             cleaned = re.sub(r"```json|```", "", raw_output).strip()
             cleaned = cleaned.replace("\\n", "\n")
 
             try:
                 data = json.loads(cleaned)
             except json.JSONDecodeError as e:
-                print(f"JSON decode error in output {i}: {e}")
-                # Optional: save the invalid raw output to a separate file for debugging
-                error_file = file_path + ".error"
-                with open(error_file, "w", encoding="utf-8") as ef:
-                    ef.write(cleaned)
-                # Skip writing the normal jsonl file
+                print(f"[Warning] Skipping invalid JSON output {i}: {e}")
+                # Skip invalid JSON silently (no error file)
                 continue
+
         elif isinstance(raw_output, list):
             data = raw_output
         else:
             data = [raw_output]
+
         if data:
-            with open(file_path, "a", encoding="utf-8") as f:
-                # Use "w" mode to overwrite any existing file, avoid append
-                for item in data:
-                    json_line = json.dumps(item, ensure_ascii=False)
+            with open(file_path, "w", encoding="utf-8") as f:  # "w" to overwrite if exists
+                # If data is a list, write each item as a JSON line
+                if isinstance(data, list):
+                    for item in data:
+                        json_line = json.dumps(item, ensure_ascii=False)
+                        f.write(json_line + "\n")
+                else:
+                    # If data is a single object, write it as one line
+                    json_line = json.dumps(data, ensure_ascii=False)
                     f.write(json_line + "\n")
             print(f"Saved: {file_path}")
         else:
             print(f"No valid data to save for output {i}, skipping file creation.")
+
+            
+            
+# def save_handlers(handler_type: str, all_outputs: list, save_dir="handlers"):
+#     output_folder = os.path.join(save_dir, handler_type)
+#     os.makedirs(output_folder, exist_ok=True)
+
+#     for i, raw_output in enumerate(all_outputs, start=1):
+#         file_name = f"{handler_type}_{i}.jsonl"
+#         file_path = os.path.join(output_folder, file_name)
+
+#         data = None
+#         if isinstance(raw_output, str):
+#             cleaned = re.sub(r"```json|```", "", raw_output).strip()
+#             cleaned = cleaned.replace("\\n", "\n")
+
+#             try:
+#                 data = json.loads(cleaned)
+#             except json.JSONDecodeError as e:
+#                 print(f"JSON decode error in output {i}: {e}")
+#                 # Optional: save the invalid raw output to a separate file for debugging
+#                 error_file = file_path + ".error"
+#                 with open(error_file, "w", encoding="utf-8") as ef:
+#                     ef.write(cleaned)
+#                 # Skip writing the normal jsonl file
+#                 continue
+#         elif isinstance(raw_output, list):
+#             data = raw_output
+#         else:
+#             data = [raw_output]
+#         if data:
+#             with open(file_path, "a", encoding="utf-8") as f:
+#                 # Use "w" mode to overwrite any existing file, avoid append
+#                 for item in data:
+#                     json_line = json.dumps(item, ensure_ascii=False)
+#                     f.write(json_line + "\n")
+#             print(f"Saved: {file_path}")
+#         else:
+#             print(f"No valid data to save for output {i}, skipping file creation.")
 
 
 # ----- Sep 02 : static field building
@@ -85,8 +133,8 @@ def save_static_jsonl_files(handler_type, data, save_dir):
         for item in data:
             f.write(json.dumps(item) + "\n")
     # print(f"💾 Saved static fields to {save_path}")
-
-
+    
+    
 # final stage
 
 from pathlib import Path
@@ -97,10 +145,10 @@ def merge_files(version: str):
     print(f" Starting merging JSONL")
 
     input_dir = Path(f"./add_handlers/output/{version}")
-    batch_folder = Path(f"dataset/batches/batch__{version}") 
+    batch_folder = Path(f"dataset/batches/{version}") 
     batch_folder.mkdir(parents=True, exist_ok=True)
 
-    output_path = batch_folder / f"batch__{version}.jsonl"
+    output_path = batch_folder / f"{version}.jsonl"
 
     final_dataset_dir = Path("dataset/final_dataset")
     final_dataset_dir.mkdir(parents=True, exist_ok=True)

@@ -8,6 +8,7 @@ from google.genai import types
 from google.api_core.retry import Retry, if_exception_type
 from google.api_core.exceptions import GoogleAPIError, ResourceExhausted
 from typing import List, Dict, Any
+from google.genai.errors import ClientError 
 
 from contextual_fields_builder.prompts.rag import RAG_PROMPT
 from contextual_fields_builder.prompts.base_llm import BASE_LLM_PROMPT
@@ -58,22 +59,49 @@ class ContextualFieldsBuilder:
         self.client = genai.Client(api_key=api_key)
         self.wait_time = 60
 
+        def is_retryable_error(exception):
+            if not isinstance(exception, ClientError):
+                return False
+            try:
+                error_info = exception.response.json() if hasattr(exception, 'response') else {}
+                error_code = error_info.get("error", {}).get("code")
+                return error_code in (429, 503)
+            except AttributeError:
+                return False
+
         self.retry = Retry(
-            predicate=if_exception_type(
-                ResourceExhausted,
-                GoogleAPIError,
-                ConnectionError,
-                TimeoutError
-            ),
-            initial=2.0,
-            maximum=120.0,
+            predicate=is_retryable_error,
+            initial=30.0,
+            maximum=800.0,
             multiplier=2.0,
-            timeout=600.0,
+            timeout=1000.0,
             on_error=self._log_retry_error
         )
 
     def _log_retry_error(self, exception: Exception) -> None:
-        print(f"[RETRY] Retryable error: {getattr(exception, 'error_details', str(exception))}")
+        print(f"[{self.handler_type}] [RETRY] ⚠️  Retryable error: {getattr(exception, 'error_details', str(exception))}")
+        
+
+#         def is_429_error(exception):
+#             if not isinstance(exception, ClientError):
+#                 return False
+#             try:
+#                 error_info = exception.response.json() if hasattr(exception, 'response') else {}
+#                 return error_info.get("error", {}).get("code") == 429
+#             except AttributeError:
+#                 return False
+
+#         self.retry = Retry(
+#             predicate=is_429_error,
+#             initial=6.0,
+#             maximum=120.0,
+#             multiplier=2.0,
+#             timeout=600.0,
+#             on_error=self._log_retry_error
+#         )
+
+#     def _log_retry_error(self, exception: Exception) -> None:
+#         print(f"\n[self.handler_type] [RETRY] Retryable error: {getattr(exception, 'error_details', str(exception))}")
 
     def load_input_range(self, start_line: int, end_line: int | None) -> List[Dict[str, Any]]:
         selected = []
@@ -89,7 +117,7 @@ class ContextualFieldsBuilder:
                         selected.append(json.loads(line))
                     except json.JSONDecodeError as e:
                         print(f"[WARN] Invalid JSON at line {line_num + 1}: {e}")
-        print(f"[INFO] Loaded {len(selected)} JSON objects from line {start_line} to {end_line}.")
+        print(f"\n[{self.handler_type} [INFO] Loaded {len(selected)} JSON objects from line {start_line} to {end_line}.")
         return selected
 
     def load_checkpoint(self) -> set:
@@ -129,7 +157,7 @@ class ContextualFieldsBuilder:
             for j, obj in enumerate(batch_data, start=1):
                 f.write(json.dumps(self.wrap_with_prompt(obj, j)) + "\n")
 
-        print(f"[Uploading] {batch_filename}")
+        print(f"\n[{self.handler_type} [Uploading] {batch_filename}")
 
         @self.retry
         def upload_file():
@@ -154,11 +182,14 @@ class ContextualFieldsBuilder:
         try:
             job = create_batch()
             return job.name
+            
         except Exception as e:
             raise RuntimeError(f"Failed to create batch {batch_filename} after retries: {e}") from e
+            
+            
 
     def poll_until_done(self, job_name: str) -> Any:
-        print(f"[Polling] Job: {job_name}")
+        print(f"\n[{self.handler_type} [Polling] Job: {job_name}")
 
         @self.retry
         def get_batch():
@@ -174,7 +205,7 @@ class ContextualFieldsBuilder:
                             raise ResourceExhausted(f"Quota exceeded for job {job_name}: {job.error.message}")
                         raise RuntimeError(f"Job {job_name} failed: {job.error}")
                     return job
-                print(f"[WAIT] State: {state}. Sleeping {self.wait_time} seconds.")
+                print(f"[{self.handler_type}] [WAIT] State: {state}. Sleeping {self.wait_time} seconds.")
                 time.sleep(self.wait_time)
             except Exception as e:
                 raise RuntimeError(f"Failed to poll job {job_name} after retries: {e}") from e
@@ -191,7 +222,7 @@ class ContextualFieldsBuilder:
         try:
             result_bytes = download_result()
         except Exception as e:
-            print(f"[ERROR] Failed to download results for batch {batch_index}: {e}")
+            print(f"[{self.handler_type}] [ERROR] Failed to download results for batch {batch_index}: {e}")
             return False
 
         result_text = result_bytes.decode("utf-8")
@@ -236,9 +267,9 @@ class ContextualFieldsBuilder:
             with error_path.open("a", encoding="utf-8") as ef:
                 for err in error_lines:
                     ef.write(f"Line {err['line_num']}: {err['error']}\nRaw line: {err['raw_line']}\n\n")
-            print(f"[!] Saved {len(error_lines)} parse errors to {error_path}")
+            print(f"[{self.handler_type}] [!] Saved {len(error_lines)} parse errors to {error_path}")
 
-        print(f"[✓] Appended batch {batch_index} results to {self.out_path}")
+        print(f"[{self.handler_type}] [✓] Appended batch {batch_index} results to {self.out_path}")
         return True
 
     def run(self, start_line: int = 0, end_line: int | None = None) -> None:
@@ -249,17 +280,17 @@ class ContextualFieldsBuilder:
         inputs = self.load_input_range(start_line, end_line)
         total = len(inputs)
         num_batches = (total + self.batch_size - 1) // self.batch_size
-        print(f"[INFO] Processing {num_batches} batches...")
+        print(f"\n[{self.handler_type}] [INFO] Processing {num_batches} batches...")
 
         processed_batches = self.load_checkpoint()
 
         for i in range(num_batches):
             batch_num = f"{start_line}_{i + 1}"
             if batch_num in processed_batches:
-                print(f"[✓] Skipping already processed batch {batch_num}")
+                print(f"[{self.handler_type}] [✓] Skipping already processed batch {batch_num}")
                 continue
 
-            print(f"\n[Batch {batch_num}]")
+            print(f"\n[{self.handler_type}] [Batch {batch_num}]")
             batch_data = inputs[i * self.batch_size: (i + 1) * self.batch_size]
 
             try:
@@ -268,7 +299,7 @@ class ContextualFieldsBuilder:
                 if self.save_results(job, batch_num):
                     processed_batches.add(batch_num)
                     self.save_checkpoint(processed_batches)
-                    print(f"Completed building contextual section of {self.handler_type}")
+                    print(f"\n[{self.handler_type}] Completed building contextual section of {self.handler_type}")
                 else:
                     print(f"[WARN] Batch {batch_num} had no valid outputs")
             except ResourceExhausted as e:
@@ -284,12 +315,12 @@ class ContextualFieldsBuilder:
                     else:
                         print(f"[WARN] Batch {batch_num} had no valid outputs after retry")
                 except Exception as retry_e:
-                    print(f"[ERROR] Retry failed: {retry_e}")
+                    print(f"\n[{self.handler_type}] [ERROR] Retry failed: {retry_e}")
                     self.save_checkpoint(processed_batches)
                     raise
             except Exception as e:
-                print(f"[ERROR] Unexpected failure: {e}")
+                print(f"[{self.handler_type}] [ERROR] Unexpected failure: {e}")
                 self.save_checkpoint(processed_batches)
                 raise
 
-        print(f"\n[✓] Total time taken: {time.time() - t1:.2f} seconds")
+        print(f"\n[{self.handler_type}]: [✓] Total time taken: {time.time() - t1:.2f} seconds")

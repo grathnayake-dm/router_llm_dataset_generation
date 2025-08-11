@@ -1,11 +1,13 @@
+from string import Template
 
-RAG_PROMPT = """
+RAG_PROMPT = Template("""
 
 You are a **system architect** specializing in the design of Retrieval-Augmented Generation (RAG) pipelines.
 
 Your task is to define **modular RAG handler components** that fulfill clearly scoped and realistic roles in the following selected domain:
 
-**`{domain}`**.
+## Domain
+**`$domain`**.
 
 ## Thought Process & Mental Model
 
@@ -14,7 +16,7 @@ You must follow this multi-step reasoning process to ensure each handler is grou
       1. **Understand the Given Domain**  
         Carefully analyze the domain  to understand its workflows, data sources, and operational pain points.
 
-      2. **Identify 70 Distinct Sub-Areas or Use Cases**  
+      2. **Identify `$count`  Distinct Sub-Areas or Use Cases**  
         Derive realistic retrieval scenarios that map to specific knowledge or decision-support functions. Each use case should represent a unique retrieval, augmentation, or generation challenge.
         Each handler contributes to different stages of the RAG workflow, such as:
         - Chunking
@@ -41,11 +43,11 @@ You must follow this multi-step reasoning process to ensure each handler is grou
 
 ---
 
-Only once this reasoning is done, output exactly 70 RAG handlers in the specified JSON structure.
+Only once this reasoning is done, output exactly `$count` RAG handlers in the specified JSON structure.
 
 
 ## Instructions
-- Generate **70** RAG modules.
+- Generate **`$count`** RAG modules.
 - Focus on practical, well-scoped functionalities relevant to real RAG systems.
 - Output a list of JSON objects. Each object must include:
   - `"name"`: A short, descriptive handler name in snake_case (must be unique and clearly reflect its purpose).
@@ -89,7 +91,7 @@ Only once this reasoning is done, output exactly 70 RAG handlers in the specifie
     -Must be unique across all generated handlers.
     -Do not duplicate acroos all the rag handlers.
     -*Enforce Naming Diversity**: Avoid repetitive use of common suffixes or prefixes such as Instead, use varied, descriptive terms that capture the specific functionality . Ensure each name is contextually distinct and avoids formulaic patterns while remaining concise and precise.
-    - ex: copilot_ella, fraud_pattern_analysis, nova_quize_assist
+    - ex: copilot_ella, fraud_pattern_copilet, nova_quize_assist_copilet
     -you must all copilot name as the suffexe or prefixes. names should be different from each other
 
   -description
@@ -104,7 +106,7 @@ Only once this reasoning is done, output exactly 70 RAG handlers in the specifie
 
 
 ## Output Format and Quality Criteria
-  -Return exactly 70 JSON objects as a well-formed JSON array.
+  -Return exactly `$count`  JSON objects as a well-formed JSON array.
   -Ensure no duplicates across any of the fields.
   -Each handler must represent a distinct role in a RAG pipeline within the given domain.
   -Keep the JSON strictly structured — no extra explanations or markdown in the final output.
@@ -118,14 +120,14 @@ You may see examples in your system memory — do not reuse their content. Learn
 ```json
 [
    {{
-    "name": "fraud_pattern_analysis",
+    "name": "copilot_fraud_pattern_analysis",
     "description": "Searches historical fraud patterns, risk rules, and transaction logs to identify suspicious activities and provide justification.",
     "handler_payload": {{
       "copilot_id": "a92346d4-a02a-4bbf-8a1b-ae449e8bd17a"
     }}
   }},
     {{
-    "name": "quiz_question_generator_copilet",
+    "name": "quiz_question_generate_copilot",
     "description": "Generates quiz questions (multiple choice, short answer) by extracting relevant concepts and facts from course materials, tagged by difficulty.",
     "handler_payload": {{
       "copilot_id": "9017e296-ac98-4990-98ae-189419ca696f"
@@ -135,9 +137,9 @@ You may see examples in your system memory — do not reuse their content. Learn
 
 
 ## Final Output Requirement
-Your response must be a valid JSON array of 70 handler objects tailored to the given domain.
+Your response must be a valid JSON array of `$count` handler objects tailored to the given domain.
 No extra formatting, no markdown — just clean JSON.
 
 ---
 
-"""
+""")

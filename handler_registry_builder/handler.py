@@ -1,7 +1,8 @@
 import os
 import time
-from .gemini import LlmGemini
+import concurrent.futures
 
+from .gemini import LlmGemini
 from .prompts.rag import RAG_PROMPT
 from .prompts.base_llm import LLM_PROMPT
 from .prompts.mcp_tool import MCP_TOOL_PROMPT
@@ -14,12 +15,12 @@ from .prompts.domains.worker_agent import usecases as worker_agent_usecases
 
 from .prompts.domains.base_llm import models
 from utils.utils import save_handlers
+from string import Template
 
 
 class RegistryBuilder:
     def __init__(self, api_key):
-        self.gemini_llm = LlmGemini(api_key = api_key)
-        
+        self.gemini_llm = LlmGemini(api_key=api_key)
 
         self.prompt_map = {
             "base_llm": LLM_PROMPT,
@@ -35,40 +36,42 @@ class RegistryBuilder:
             "worker_agent": [getattr(worker_agent_usecases, name) for name in worker_agent_usecases.__all__]
         }
 
-    def _build_prompt(self, handler_type: str, domain: str) -> str:
+    def _build_prompt(self, handler_type: str, domain: str, hander_count_per_domain : str) -> str:
         if handler_type == "base_llm":
             model_list = [getattr(models, name) for name in models.__all__]
-            return self.prompt_map[handler_type].format(domain=domain, model_list=model_list)
+            return self.prompt_map[handler_type].substitute(domain=domain, model_list=model_list, count = hander_count_per_domain)
         else:
-            return (
-                f"You are designing tools for the selected domain. "
-                f"Follow the prompt template below to generate the tools: {self.prompt_map[handler_type]}"
-            )
+            return self.prompt_map[handler_type].substitute( domain=domain,count = hander_count_per_domain
+)
 
-    def build_registry(self, handler_type: str, version: str):
+    def build_registry(self, handler_type: str, version: str, hander_count_per_domain: str):
         if handler_type not in self.prompt_map:
-            raise ValueError(f"[❌] Invalid handler type: {handler_type}")
+            raise ValueError(f"{handler_type}: [❌] Invalid handler type: {handler_type}")
 
         print(f"[🔧] Building registry for handler_type: {handler_type}")
-
         usecases = self.usecase_map[handler_type]
         all_outputs = []
 
-        for domain in usecases:
-            print("44444444444444444444")
-            prompt = self._build_prompt(handler_type, domain)
-            print("55555555555555555555555", handler_type)
-            print(f"{handler_type}: [🧠] Calling Gemini")
-            print("66666666666666666666666", handler_type)
+        def process_domain(domain):
+            try:
+                prompt = self._build_prompt(handler_type, domain, hander_count_per_domain)
+                print(f"{handler_type}: [🧠] Calling Gemini for domain")
+                start_time = time.time()
+                output = self.gemini_llm.call_gemini(prompt)
+                end_time = time.time()
+                print(f"{handler_type}: [✅] Done with domain in {end_time - start_time:.2f}s")
+                return output
+            except Exception as e:
+                print(f"{handler_type}:  [❌] Error processing domain: {e}")
+                return None
 
-            start_time = time.time()
-            output = self.gemini_llm.call_gemini(prompt)
-            end_time = time.time()
-            all_outputs.append(output)
-            print(f"{handler_type}: [✅] Done with domain:{end_time - start_time:.2f}s")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(10, len(usecases))) as executor:
+            futures = [executor.submit(process_domain, domain) for domain in usecases]
+            for future in concurrent.futures.as_completed(futures):
+                result = future.result()
+                if result:
+                    all_outputs.append(result)
 
         save_path = f"./handler_registry_builder/handler_registries/{version}"
         save_handlers(handler_type, all_outputs, save_dir=save_path)
-        print(f"{handler_type}:[💾] Saved handler registry in: {save_path}/{handler_type}")
-
-
+        print(f"{handler_type}: [💾] Saved handler registry in: {save_path}/{handler_type}")

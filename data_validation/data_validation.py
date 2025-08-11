@@ -1,9 +1,16 @@
+import sys
 import os
 import json
 import time
 from pathlib import Path
 from google import genai
 from google.genai import types
+from google.api_core.retry import Retry, if_exception_type
+from google.api_core.exceptions import GoogleAPIError, ResourceExhausted
+from typing import List, Dict, Any
+from google.genai.errors import ClientError 
+
+
 from .prompts.base_llm import BASE_LLM_PROMPT
 from data_validation.prompts.rag import RAG_PROMPT
 from data_validation.prompts.worker_agent import WORKER_AGENT_PROMPT
@@ -16,18 +23,17 @@ PROMPT_MAP = {
     "mcp_tool": MCP_TOOL_PROMPT,
 }
 
-
 class DataValidator:
     def __init__(
-    self,
-    api_key: str,
-    version: str,
-    handler_type: str,
-    batch_size: int = 300,
-    start_line: int = 0,
-    end_line: int = None,
-    model_id: str = "gemini-2.5-pro",
-):
+        self,
+        api_key: str,
+        version: str,
+        handler_type: str,
+        batch_size: int = 300,
+        start_line: int = 0,
+        end_line: int = None,
+        model_id: str = "gemini-2.5-pro",
+    ):
         self.api_key = api_key
         self.version = version
         self.handler_type = handler_type
@@ -35,22 +41,25 @@ class DataValidator:
         self.start_line = start_line
         self.end_line = end_line
         self.model_id = model_id
-        # Define input path directly
-        self.input_path = Path(f"./contextual_fields_builder/contextual_output/{version}/{handler_type}/{handler_type}.jsonl")
+        self.input_path =       Path(f"./contextual_fields_builder/contextual_output/{version}/{handler_type}/{handler_type}.jsonl")
         if not self.input_path.exists():
             raise FileNotFoundError(f"Input file not found: {self.input_path}")
 
         self.input_filename = self.input_path.name
 
+        # Output directory
         base_output_dir = Path(f"./data_validation/validated_output/{version}")
         base_output_dir.mkdir(parents=True, exist_ok=True)
 
+        # Merged valid+refined output at top level
         self.merged_valid_refined_path = base_output_dir / self.input_filename
         self.merged_valid_refined_path.parent.mkdir(parents=True, exist_ok=True)
 
+        # Metadata directory
         self.base_output_dir = base_output_dir / "metadata" / self.input_filename.replace(".jsonl", "").replace(".json", "")
         self.base_output_dir.mkdir(parents=True, exist_ok=True)
 
+        # Subdirectories
         self.raw_output_dir = self.base_output_dir / "raw_output"
         self.raw_output_dir.mkdir(exist_ok=True)
 
@@ -71,17 +80,58 @@ class DataValidator:
 
         self.checkpoint_path = self.base_output_dir / "checkpoint.json"
 
-        # Prompt
         self.prompt = PROMPT_MAP[handler_type]
 
-        # Gemini client
         self.client = genai.Client(api_key=api_key)
-        self.wait_time = 30  # seconds
 
+        self.wait_time = 30
+
+        def is_retryable_error(exception):
+            if not isinstance(exception, ClientError):
+                return False
+            try:
+                error_info = exception.response.json() if hasattr(exception, 'response') else {}
+                error_code = error_info.get("error", {}).get("code")
+                return error_code in (429, 503)
+            except AttributeError:
+                return False
+
+        self.retry = Retry(
+            predicate=is_retryable_error,
+            initial=30.0,
+            maximum=480.0,
+            multiplier=2.0,
+            timeout=600.0,
+            on_error=self._log_retry_error
+        )
+
+    def _log_retry_error(self, exception: Exception) -> None:
+        print(f"[{self.handler_type}] [RETRY] ⚠️  Retryable error: {getattr(exception, 'error_details', str(exception))}")
+
+#         def is_429_error(exception):
+#             if not isinstance(exception, ClientError):
+#                 return False
+#             try:
+#                 error_info = exception.response.json() if hasattr(exception, 'response') else {}
+#                 return error_info.get("error", {}).get("code") == 429
+#             except AttributeError:
+#                 return False
+
+#         self.retry = Retry(
+#             predicate=is_429_error,
+#             initial=6.0,
+#             maximum=120.0,
+#             multiplier=2.0,
+#             timeout=600.0,
+#             on_error=self._log_retry_error
+#         )
+
+#     def _log_retry_error(self, exception: Exception) -> None:
+#         print(f"[{self.handler_type}] [RETRY] Retryable error: {getattr(exception, 'error_details', str(exception))}")
 
     def load_input_range(self, start_line, end_line):
         selected = []
-        print(f"[DEBUG] Opening input file: {self.input_path}")
+        print(f"[{self.handler_type}]: [DEBUG] Opening input file: {self.input_path}")
         with self.input_path.open("r", encoding="utf-8") as f:
             for line_num, line in enumerate(f):
                 if line_num < start_line:
@@ -106,7 +156,7 @@ class DataValidator:
                     print(f"[WARN] Invalid JSON at line {line_num + 1}: {e}")
                     print(f"[WARN] Offending line: {line}")
 
-        print(f"[INFO] Loaded total {len(selected)} JSON objects from line {start_line} to {end_line}")
+        print(f"\n[{self.handler_type}]: [INFO] Loaded total {len(selected)} JSON objects from line {start_line} to {end_line}")
         return selected
 
     def load_checkpoint(self):
@@ -132,7 +182,7 @@ class DataValidator:
 INPUT_JSON:
 {json.dumps(obj, indent=2)}
 
-Instructions to review and refine above INPUT_JSON :
+Instructions to review and refine above INPUT_JSON:
 {self.prompt}
 """
                             }
@@ -150,36 +200,71 @@ Instructions to review and refine above INPUT_JSON :
             for j, obj in enumerate(batch_data, start=1):
                 f.write(json.dumps(self.wrap_with_prompt(obj, j)) + "\n")
 
-        print(f"[Uploading] {batch_filename}")
-        uploaded_file = self.client.files.upload(
-            file=str(temp_path),
-            config=types.UploadFileConfig(display_name=batch_filename, mime_type='jsonl')
-        )
+        print(f"\n[{self.handler_type}]: [Uploading] {batch_filename}")
 
-        job = self.client.batches.create(
-            model=self.model_id,
-            src=uploaded_file.name,
-            config={"display_name": f"job_for_{batch_filename}"}
-        )
-        return job.name
+        @self.retry
+        def upload_file():
+            return self.client.files.upload(
+                file=str(temp_path),
+                config=types.UploadFileConfig(display_name=batch_filename, mime_type='jsonl')
+            )
+
+        try:
+            uploaded_file = upload_file()
+        except Exception as e:
+            raise RuntimeError(f"Failed to upload {batch_filename} after retries: {e}") from e
+
+        @self.retry
+        def create_batch():
+            return self.client.batches.create(
+                model=self.model_id,
+                src=uploaded_file.name,
+                config={"display_name": f"job_for_{batch_filename}"}
+            )
+
+        try:
+            job = create_batch()
+            return job.name
+        except Exception as e:
+            raise RuntimeError(f"Failed to create batch {batch_filename} after retries: {e}") from e
 
     def poll_until_done(self, job_name):
-        print(f"[Polling] Job: {job_name}")
+        print(f"\n[{self.handler_type}]: [Polling] Job: {job_name}")
+
+        @self.retry
+        def get_batch():
+            return self.client.batches.get(name=job_name)
+
         while True:
-            job = self.client.batches.get(name=job_name)
-            state = job.state.name
-            if state in ("JOB_STATE_SUCCEEDED", "JOB_STATE_FAILED", "JOB_STATE_CANCELLED"):
-                return job
-            print(f"[WAIT] State: {state}. Sleeping {self.wait_time} seconds.")
-            time.sleep(self.wait_time)
+            try:
+                job = get_batch()
+                state = job.state.name
+                if state in ("JOB_STATE_SUCCEEDED", "JOB_STATE_FAILED", "JOB_STATE_CANCELLED"):
+                    if state == "JOB_STATE_FAILED" and hasattr(job, 'error'):
+                        if job.error.code == 429:
+                            raise ResourceExhausted(f"Quota exceeded for job {job_name}: {job.error.message}")
+                        raise RuntimeError(f"Job {job_name} failed: {job.error}")
+                    return job
+                print(f"[{self.handler_type}]: [WAIT] State: {state}. Sleeping {self.wait_time} seconds.")
+                time.sleep(self.wait_time)
+            except Exception as e:
+                raise RuntimeError(f"Failed to poll job {job_name} after retries: {e}") from e
 
     def save_results(self, job, batch_index):
         if job.state.name != "JOB_STATE_SUCCEEDED":
-            print(f"[ERROR] Job failed: {job.error}")
+            print(f"[{self.handler_type}]: [ERROR] Job failed: {job.error}")
             return
 
-        result_file = job.dest.file_name
-        result_bytes = self.client.files.download(file=result_file)
+        @self.retry
+        def download_result():
+            return self.client.files.download(file=job.dest.file_name)
+
+        try:
+            result_bytes = download_result()
+        except Exception as e:
+            print(f"[{self.handler_type}]: [ERROR] Failed to download results for batch {batch_index}: {e}")
+            return
+
         result_text = result_bytes.decode("utf-8")
 
         parsed_outputs = []
@@ -198,7 +283,7 @@ Instructions to review and refine above INPUT_JSON :
                         text_block = "\n".join(lines)
                     parsed_outputs.append(json.loads(text_block))
             except Exception as e:
-                print(f"[WARN] Error parsing output line {line_num}: {e}")
+                print(f"[{self.handler_type}]: [WARN] Error parsing output line {line_num}: {e}")
 
         raw_out_path = self.raw_output_dir / f"output_{batch_index}.jsonl"
         with raw_out_path.open("a", encoding="utf-8") as f:
@@ -221,12 +306,13 @@ Instructions to review and refine above INPUT_JSON :
                 categorized["UNKNOWN"].append({"line": line_num, "data": data})
 
         def append_jsonl(filepath, data_list):
+
             with filepath.open("a", encoding="utf-8") as f:
                 for item in data_list:
                     try:
                         f.write(json.dumps(item, ensure_ascii=False) + "\n")
                     except Exception as e:
-                        print(f"[WARN] Failed to write JSON in {filepath}: {e}")
+                        print(f"\n[{self.handler_type}]: [WARN] Failed to write JSON in {filepath}: {e}")
 
         append_jsonl(self.valid_dir / f"valid_{batch_index}.jsonl", categorized["VALID"])
         append_jsonl(self.refined_dir / f"refined_{batch_index}.jsonl", categorized["REFINED"])
@@ -238,26 +324,28 @@ Instructions to review and refine above INPUT_JSON :
                 try:
                     f.write(json.dumps(entry, ensure_ascii=False) + "\n")
                 except Exception as e:
-                    print(f"[WARN] Failed to write merged valid/refined JSON: {e}")
+                    print(f"\n[{self.handler_type}]: [WARN] Failed to write merged valid/refined JSON: {e}")
 
-        print(f"[✓] Saved batch {batch_index} results.")
+        print(f"\n[{self.handler_type}]: [✓] Saved batch {batch_index} results.")
 
     def run(self):
+        print(f"\n[{self.handler_type}]: Start Data Validation Process")
+
         t1 = time.time()
         inputs = self.load_input_range(self.start_line, self.end_line)
         total = len(inputs)
         num_batches = (total + self.batch_size - 1) // self.batch_size
-        print(f"[INFO] Processing {num_batches} batches...")
+        print(f"\n[{self.handler_type}]: [INFO] Processing {num_batches} batches...")
 
         processed_batches = self.load_checkpoint()
 
         for i in range(num_batches):
             batch_num = f"{self.start_line}_{i + 1}"
             if batch_num in processed_batches:
-                print(f"[✓] Skipping already processed batch {batch_num}")
+                print(f"\n[{self.handler_type}]: [✓] Skipping already processed batch {batch_num}")
                 continue
 
-            print(f"\n[Batch {batch_num}]")
+            print(f"\n[{self.handler_type}]: [Batch {batch_num}]")
             batch_data = inputs[i * self.batch_size : (i + 1) * self.batch_size]
 
             try:
@@ -268,10 +356,23 @@ Instructions to review and refine above INPUT_JSON :
                 processed_batches.add(batch_num)
                 self.save_checkpoint(processed_batches)
 
+            except ResourceExhausted as e:
+                print(f"[{self.handler_type}]: [ERROR] Quota exceeded: {e}. Retrying after wait...")
+                time.sleep(self.wait_time)
+                try:
+                    job_name = self.upload_and_run_batch(batch_data, batch_num)
+                    job = self.poll_until_done(job_name)
+                    self.save_results(job, batch_num)
+                    processed_batches.add(batch_num)
+                    self.save_checkpoint(processed_batches)
+                except Exception as retry_e:
+                    print(f"\n[{self.handler_type}]: [ERROR] Retry failed: {retry_e}")
+                    self.save_checkpoint(processed_batches)
+                    raise
             except Exception as e:
-                print(f"[❌] Batch {batch_num} failed: {e}")
-                print("[⚠️] Saving checkpoint and exiting...")
+                print(f"[{self.handler_type}]: [❌] Batch {batch_num} failed: {e}")
+                print(f"[{self.handler_type}]: [⚠️] Saving checkpoint and exiting...")
                 self.save_checkpoint(processed_batches)
-                return
+                raise
 
-        print(f"\n[✓] Total time taken: {time.time() - t1:.2f} seconds")
+        print(f"\n[{self.handler_type}]: [✓] Total time taken: {time.time() - t1:.2f} seconds")

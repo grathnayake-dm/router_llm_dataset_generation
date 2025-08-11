@@ -1,18 +1,13 @@
-LLM_PROMPT = """
+from string import Template
+LLM_PROMPT = Template("""
+
 
 You are a system designer specializing in building structured catalogs of LLM-powered tools.
 
-Your task is to generate a JSON catalog with 50 jsons of llm for LLM-based systems, specifically designed for ** text, image, video, or audio** use cases **within specifically tailored to:
+Your task is to generate a JSON catalog with `$count` jsons of llm for LLM-based systems, specifically designed for ** text, image, video, or audio** use cases **within specifically tailored to:
 
----
-
-## Domain:
-"{domain}"
-
-## Model List:
-{model_list}
-
-Each model has specific capabilities (text, audio, image, video). Match the use case to an appropriate model that supports the needed modalities.
+## Domain
+**`$domain`**.
 
 ---
 
@@ -71,11 +66,19 @@ This ensures a balanced and traceable catalog of both general and specialized LL
 
 ### Model Selection Rules
 
-You are given a list of available LLM models under **Model List**. These models may vary across runs and are not fixed.
+You are given a list of available LLM models as follows .  ou have toselect models form this kist for the json catalog generation/
+
+#### Model List:
+`$model_list`
+
+Each model has specific capabilities (text, audio, image, video). Match the use case to an appropriate model that supports the needed modalities.
+
+These models may vary across runs and are not fixed.
 
 For each JSON catalog generation:
 - **Dynamically analyze the models** provided and choose exactly best match the needs of the domain and sub-use-cases.
-- The selection must be based on the **input/output modalities** and the **functional diversity** needed within the domain 
+- The selection must be based on the **input/output capabilities** and the **functional diversity** needed within the domain 
+- usecases should be selected based on the input/ output types of the selected model.
 - Ensure **diversity across multiple catalogs** — avoid repeating the same  models for every catalog run.
 
 
@@ -104,7 +107,7 @@ For each JSON catalog generation:
 ```json
 [
   {{
-    "name": "<unique_llm_tool_name>",
+    "name": "<unique_llm_name>",
     "description": "<Describing the LLM tool's specific function>",
     "model_provider": "<LLM provider>",
     "model_name": "<Specific model name>",
@@ -117,25 +120,24 @@ For each JSON catalog generation:
 - **name**
   - Must combine the LLM model name (e.g., gemini, claude, gpt, etc.) with a creative and/or functional suffix.
   - The name should be in snake_case, concise, unique, and expressive.
-  - Blend task + creativity + model awareness — avoid overly formulaic names
-  - Must reflect the functionality of the llm  .
+  - Blend task + creativity  — avoid overly formulaic names
   - Must be unique across all generated tools.
-  - example:  gemini_docs_reader, code_complexity_analyzer, elitehr_employee_benefit_infographic_gen
+  - example:  aliza, O3_larize, holka_writter, cloude_optimus
       -If `is_workspace_default = false` (Generic/Public LLM)
         - Must combine the LLM model name (e.g., gemini, claude, gpt, mistral) with a creative and/or functional suffix.
         - Name should evoke the LLM’s role or character while staying general-purpose.
         - Examples:
           - `claude_oracle`
-          - `gemini_insight_forge`
+          - `aliza_plam`
           - `codecraft_gpt`
-          - `mistral_quickscribe`
+          - `holka_writter`
 
       - If `is_workspace_default = true` (Company/Workspace-specific LLM)
         - Must begin/ end with a **workspace, product, or ecosystem name** (e.g., elitehr, acme, visionos).
         - Should still include a creative or functional suffix tied to its role.
         - Examples:
-          - `elitehr_benefit_genie`
-          - `policy_mapper_acme`
+          - `dm_private`
+          - `Infose_holka`
           - `visionos_docpulse`
           - `medsys_ai_default_assist`
 
@@ -156,7 +158,7 @@ For each JSON catalog generation:
   - All other handlers should have `false`.
 
 ## Output Format and Quality Criteria
-- Return exactly 50 JSON objects as a well-formed JSON array.
+- Return exactly `$count` JSON objects as a well-formed JSON array.
 - Ensure no duplicates across any of the fields.
 - Each catalog must represent a distinct role in an LLM workflow within the given domain.
 - Keep the JSON strictly structured — no extra explanations or markdown in the final output.
@@ -175,7 +177,7 @@ For each JSON catalog generation:
   }},
 
 {{
-    "name": "claude_oracle",
+    "name": "Helga",
     "description": "Analyzes code for cyclomatic complexity and other metrics, suggesting simplification for improved maintainability.",
     "model_provider": "Claude",
     "model_name": "claude-3-7-sonnet",
@@ -185,11 +187,11 @@ For each JSON catalog generation:
 
 ## Final Instructions
 
-- Your response must be a valid JSON array of 50 handler objects tailored to the given domain.
-    35 for is_workspace_default = False
-    15 for  is_workspace_default = True
+- Your response must be a valid JSON array of `$count` handler objects tailored to the given domain.
+    75% for is_workspace_default = False
+    25% for  is_workspace_default = True
 - No extra formatting, no markdown — just clean JSON.
 
 ---
 
-"""
+""")

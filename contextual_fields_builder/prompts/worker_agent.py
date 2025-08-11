@@ -36,15 +36,15 @@ The steps are:
 
 ## TASK OVERVIEW:
 - This task involves a two-stage process for each INPUT_JSON provided:
-    -STAGE 1 — Generate Content: Based on the INPUT_JSON, generate 4 unique and dynamic data entries. Each entry will contain a user query, the reasoning for the routing decision, and a detailed chain-of-thought.
-    -STAGE 2 — Update and Finalize JSON: For each of the 4 generated entries, create a deep copy of the original INPUT_JSON and inject the generated content into the appropriate fields.
+    -STAGE 1 — Generate Content: Based on the INPUT_JSON, generate 6 unique and dynamic data entries. Each entry will contain a user query, the reasoning for the routing decision, and a detailed chain-of-thought.
+    -STAGE 2 — Update and Finalize JSON: For each of the 6 generated entries, create a deep copy of the original INPUT_JSON and inject the generated content into the appropriate fields.
 
 ### STAGE 1
     - You will be given  a SAMPLE INPUT JSONL as follows:
 {"input": {"id": "1a28002b-5f5d-46a9-8458-c5ec28f76ccb", "timestamp": "2025-03-20T14:49:36.125555", "query": "", "conversation_summary": "", "handler_registry": {"mcp_tools": [], "worker_agents": [{"name": "proactive_risk_identifier", "description": "Predicts potential project risks like delays or resource shortages by analyzing current project data and historical trends. Requires the project ID to analyze.", "http_endpoint": "https://risk-sentinel.monday.com/api/v2/projects/risks/predict", "payload_schema": {"type": "object", "properties": {"project_id": {"title": "Project ID", "type": "string"}, "risk_category_filter": {"title": "Risk Category Filter", "type": "string"}}, "required": ["project_id"]}, "workspace_id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b"}], "llm_handlers": [], "rag_handlers": [], "compiled_at": "2025-03-19T18:38:59.125555", "user_id": "1f71b28a-08a3-474a-abee-ae6ea4909a08", "workspace_id": "2bc3faa6-dcc7-404a-ad8b-dcf3dc4701c3"}, "copilot_id": null, "thread_id": "e3d69e32-2c81-4ad8-9a36-a33b2c7023f9"}, "output": {"select_handler_type": "worker_agent", "handler_name": "proactive_risk_identifier", "server_name": null, "tool_name": null, "copilot_id": null, "missing_fields": [], "optional_suggestions": [], "suggested_payload": {}, "confidence": 0.604968, "reasoning": "", "chain_of_thought": [], "workspace_preference_override": false}}
 
-#### Generate 4 Data Points
-    -Create four (4) data points following the structure below:
+#### Generate 6 Data Points
+    -Create six (6) data points following the structure below:
 
     I. Complete Parameter Coverage (2 Data Points)
     -Generate two (2) data points where all required fields are present. Use any two of the following inclusion types:
@@ -59,14 +59,14 @@ The steps are:
         - Required fields are missing only in conversation_summary.
 
 
--For each INPUT_JSON, generate four diverse output samples simulating how a user might trigger the selected handler. Each sample must include the following fields:
+-For each INPUT_JSON, generate six diverse output samples simulating how a user might trigger the selected handler. Each sample must include the following fields:
   -Required Fields per Sample:
     -query: A natural-sounding user query that would appropriately invoke the selected handler. This may contain implicit or explicit references to required schema parameters.
     -conversation_summary: A realistic summary of prior conversation context, helping justify parameter grounding or task continuity.
     - handle missing_fields, suggested_payload, optional_suggetion according to the way the conversation_summary and user query is implemented {based on how required parameters are applied on query and conversation memory}
     -reasoning: A concise justification explaining why the selected handler is the most appropriate match for the query.
     -chain_of_thought (CoT): A step-by-step explanation of how the Router llm  analyzed the query, considered handler capabilities, and validated parameter readiness to select worker agent.
-  -Each of the 4 samples should simulate a distinct and realistic user scenario, varying in phrasing, specificity  to ensure dataset diversity.
+  -Each of the 6 samples should simulate a distinct and realistic user scenario, varying in phrasing, specificity  to ensure dataset diversity.
 
 {
   "query": "<string>",                     // Natural-language user request
@@ -107,7 +107,7 @@ Example Output Entry :
     "itsm_api_token": "58965MKI-ko",
     "summary": "Check the status of an incident ticket for the billing application in the PROD-19 environment."
   },
-  "reasoning": "The user's request to check the status of an incident ticket aligns with the `check_incident_status` Worker Agent, but the specific `incident_id` is missing, preventing invocation. The environment ID and API token are provided, but complete parameter coverage is required for execution.",
+"reasoning": "The user’s intent to verify an incident’s status matches the functionality of the `check_incident_status` Worker Agent. Invocation is blocked because the mandatory `incident_id` parameter is absent. Although `environment_id` and `api_token` are provided, the missing field prevents the request from being executed by the selected agent.",
   "chain_of_thought": [
     "The user is requesting a status update on an incident ticket related to performance issues in the billing application.",
     "I identified the `check_incident_status` Worker Agent as the best match, as it retrieves incident ticket details from the ITSM system.",
@@ -136,7 +136,7 @@ Example Output Entry :
     "compliance_ruleset": "SEC-2025-Q2",
     "itsm_api_token": "58965MKI-ko"
   },
-  "reasoning": "The request to validate a change request aligns perfectly with the `validate_change_request` Worker Agent. All required parameters—change_request_id, environment_id, compliance_ruleset, and itsm_api_token—are provided, making the agent ready for invocation.",
+"reasoning": "The request to validate a change request matches the core capabilities of the `validate_change_request` Worker Agent. Since all necessary parameters—`change_request_id`, `environment_id`, `compliance_ruleset`, and `itsm_api_token`—are present, the agent is fully prepared and request is routed to the agent.",
   "chain_of_thought": [
     "The user is requesting validation of a change request for a firewall update.",
     "The `validate_change_request` Worker Agent is the best match, as it automates change request validation in the ITSM system.",
@@ -161,9 +161,9 @@ Example Output Entry :
            - output.suggested_payload → from generated suggested_payload
            - output.reasoning → from generated reasoning
            - output.chain_of_thought → from generated chain_of_thought
-- This yields 4 updated INPUT_JSON objects, each representing one enriched and realistic scenario.
+- This yields 6 updated INPUT_JSON objects, each representing one enriched and realistic scenario.
 - All the  other fields in the original INPUT_JSON remain unchanged .
--The final output should be a list of 4 modified JSON objects, each being a fully updated copy of the original INPUT_JSON,  with the following updated values  in its input and  output fields replaced using the generated schema fields.
+-The final output should be a list of 6 modified JSON objects, each being a fully updated copy of the original INPUT_JSON,  with the following updated values  in its input and  output fields replaced using the generated schema fields.
 
 {
   "input": {
@@ -264,7 +264,7 @@ final output must strictly preserve the structure of the original INPUT_JSON sch
             "summary": "User wants to optimize resources for the 'Market-Expansion-APAC' project."
         },
         "confidence": 0.69052,
-        "reasoning": "The user's intent to use the 'optimizer' for a specific project clearly points to the `resource_allocation_optimizer` agent. However, the agent cannot be invoked because the required `resource_types` parameter is missing. The `project_id` was found, but more information is needed.",
+        "reasoning": "The request to optimize resources for a particular project matches the core functionality of the `resource_allocation_optimizer` agent. Despite this alignment, invocation is not possible because the `resource_types` parameter has not been provided. Although the `project_id` is available, the missing parameter must be supplied before the agent can run.",
         "chain_of_thought": [
             "I identified the user's intent is to 'run the optimizer' on a project.",
             "The `resource_allocation_optimizer` agent is the only handler that matches this function.",
@@ -341,7 +341,7 @@ final output must strictly preserve the structure of the original INPUT_JSON sch
               "resource_types": "equipment, on-site staff"
           },
           "confidence": 0.69052,
-          "reasoning": "The `resource_allocation_optimizer` is the correct agent for this task. The `project_id` was identified from the conversation summary, and the `resource_types` were specified in the user's latest query. With all required parameters available, the agent is ready to run.",
+          "reasoning": "The user’s request is perfectly aligned with the capabilities of the `resource_allocation_optimizer` agent. The `project_id` was obtained from the conversation summary, and the `resource_types` were provided in the latest query. With all required parameters available, the agent is fully prepared for invocation.",
           "chain_of_thought": [
               "The user's query asks to 'optimize' specific resources for a project.",
               "This aligns with the `resource_allocation_optimizer` agent's purpose.",
@@ -496,8 +496,6 @@ The system must decide what to include in `missing_fields` and `suggested_payloa
 
 ---
 
----
-
 ### Behavior of the `summary` Key in `suggested_payload`
 
 The `summary` field inside the `suggested_payload` is **only included under a specific scenario** — when **some (but not all)** required fields are missing.
@@ -551,7 +549,7 @@ In this special case (partially missing fields), the `summary` provides a **brie
 
 ### How to Implement query and conversation_summary with Varying Parameter Placements
 
-To ensure diverse yet realistic data coverage, you must intentionally control where the required parameters appear across query and conversation_summary. You are generating 4 data points total, each belonging to one of two categories.
+To ensure diverse yet realistic data coverage, you must intentionally control where the required parameters appear across query and conversation_summary. You are generating 6 data points total, each belonging to one of two categories.
     I. Complete Parameter Coverage (2 Data Points)
     -Generate two (2) data points where all required fields are present. Use any two of the following inclusion types:
         - All required fields are included in both conversation_summary and query.
@@ -639,8 +637,7 @@ To ensure diverse yet realistic data coverage, you must intentionally control wh
     - Make sure the query sounds contextual, not like a prompt for a tool or test system.
     “While generating each data point, I must actively decide which required parameters appear in the query, which appear in the conversation_summary, and which are left missing — based on the combination pattern being implemented.”
 
-
- 2 conversation_summary 
+2 conversation_summary 
 
 The `conversation_summary` simulates realistic, memory-aware interactions between a user and the system. It acts as a **contextual bridge** between past and present queries, helping the system reason about continuity, intent, and user goals.
 Begin by understanding the handler’s functionality. 
@@ -651,51 +648,53 @@ Begin by understanding the handler’s functionality.
             - Identify realistic enterprise workflows or interactions that could lead to the current query.
             - Use Domain-Relevant Scenarios . Build summaries around authentic user behavior.
 
-        - Include Parameter Seeds or Identifiers
-            - Use specific names, IDs, and terms to simulate grounded memory. These are important for relevance and contextual linking.
-                - >*“You previously reviewed the `AuthController.validateToken()` method after encountering a session expiry issue in `release-v2.9.3`.”*
-
+        - Ground the Narrative with Specific Identifiers (MANDATORY):
+            - To simulate a real memory, you MUST include specific, non-generic identifiers.
+                - Good: Ticket IDs (INC-9812), Change Requests (CR-8802), Project Codenames (Project Apollo), File Versions (release-v2.9.3), Hostnames (prod-reporting-db-replica), or specific company/person names.
+                - Bad: "the server," "a file," "the ticket."
+    
         - Simulate a Chronological Memory Trail
-            - Write 2–4 lines showing **conversation flow** over time:
-                - Initial request  
-                - System response  
-                - User clarification  
-                - System follow-up  
-            - > *“You first investigated the structure of the `report_generator` module. After identifying missing dependencies, you asked for design notes connected to the data ingestion component.”*
+            - Every conversation_summary MUST be a short story of 5-8 lines that follows a clear narrative arc. Do not just list facts; connect them into a logical sequenc
+                - Detail the Intermediate Steps (The "How they got here"):
+                - Describe distinct, logical actions the user took before the current query.            
+                - Show a progression of thought. Did they start broad and then narrow down? Did they try one thing that didn't work, leading to the next step?
+                    - Example: "User initially explored server performance degradation across prod-reporting-db-replica and cache-node-17. After correlating system metrics with incident timelines, they isolated three critical events linked to spike periods. Subsequently, user pulled related Jira tickets (INC-9812, INC-9820, CR-8802) to trace root causes and validate mitigation actions. With most metrics reconciled, user checked consolidated SLA breach summary focusing on escalations during the July 28–August 4 window for QA-11, DEV-02, and PROD-44."
 
-        - Reflect Multi-Turn or Ongoing Engagement
-            - Simulate continuity — make it feel like part of a **threaded initiative** or **recurring process**.
-            - >*“As part of the Q2 compliance review, you’ve been exploring access control logic across the `UserPolicy` layer. In the last session, you confirmed gaps in the audit trail and requested links to the policy validation logic.”*
-                
-                - Add Rich Context + Prior Contacts
-            -You must provide a detailed, imaginative yet context-grounded narrative of the user's earlier actions. Include:
+        - Add Rich Context + Prior Contacts
+            -To simulate memory continuity and enterprise-level realism, your conversation_summary must include detailed, plausible background actions that led to the current query. 
                 - Broader initiatives
                 - Realistic — infer probable past steps from current query
-
+                    - Example : "infrastructure upgrade for internal knowledge assistants, the user initially benchmarked EmbedderV3 performance on curated document sets tied to the HR and Legal domains. Most recently, user asked to refine reranker thresholds and inspect scoring metrics tied to the copilot_id: org_compliance_bot."
 
 -You can implement conversation_summary in two ways:
     -As a list of multiple summary strings, like this:
-        conversation_summary = "Last week, user explored architectural dependencies around the `BillingService` class after reporting inconsistent charge logic during nightly ETL jobs."
+        conversation_summary = "User evaluated document retrieval performance of the `ContractReviewAgent` after reports of missing results in legal query flows. They tested retrieval against a curated contract dataset and flagged inconsistencies tied to outdated index versions."
     -Sometimes this summary may be empty. if you chose this way make sur to add all the necessary content with in query.
         conversation_summary = ""
 
--Example for Converstion memory
-    > *user previously explored how the `DataSyncManager` interacts with `SyncWorker` during job execution. After retrieving class definitions and init methods, user asked for related design notes tied to the `stream_batch()` pipeline. The system retrieved class hierarchy mappings and pointed out recent architectural changes merged from `dev/feature-sync`.”*
-    > *“Last week, user explored architectural dependencies around the `BillingService` class after reporting inconsistent charge logic during nightly ETL jobs.”*
+-Example: Good vs. Bad Summaries
+This illustrates the level of detail required.
+    - BAD (Vague, Generic, or Including Present Request):
+        - "User was looking at financial data. They previously viewed 'Annual Financial Household Report 2025' report."
+            - (Why it’s bad: No specific goal, no identifiers, no story, no human context.)
+        - "User is now asking to extract a specific financial metric from a given chart." 
+             -(Why it’s bad: This includes the user’s current request, which should never appear in the conversation summary — the summary must only reflect previous interactions.)
 
-While generating each data point, I must actively decide which required parameters appear in the query, which appear in the conversation_summary, and which are left missing — based on the combination pattern being implemented.”
+    -GOOD (Detailed, Narrative-Driven, and Specific):
+        - "User started the Q3 competitive analysis of Apex Innovations by reviewing public stock trends. They summarized key analyst reports highlighting strong growth in Cloud Services. To verify this, user requested the official Q3 earnings report but was only able to locate a low-quality scanned PDF of the earnings slides."     
 
+- for each sample use different diverse conversation memory implementations.
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
 
 3. reasoning 
-- agent  Suggestions
-- You are evaluating whether the current user query and conversation memory provide enough information to **select and invoke a specific MPC tool** from the registry.
+- You are evaluating whether the current user query and conversation memory provide enough information to **select and invoke a specific worker agent** from the registry.
 - Follow these steps strictly:
         Step 1: Check Required Parameters
-            - Refer to the `input_schema` of the MPC tool.
+            - Refer to the `payload_schema` of the worker agent.
             - Identify the list of **required fields** (e.g., `["patient_id", "appointment_type", "appointment_datetime"]`).
         Step 2: Assess Parameter Coverage
             - Examine whether **all required parameters** are present, either in the `query`, the `conversation_summary`, or a combination of both.
-            - If **all required fields are present**, respond with a sentence like “This request can be delegated to the MPC tool as all invocation requirements are satisfied.”
+            - If **all required fields are present**, respond with a sentence like “This request can be delegated to the worker_agent as all invocation requirements are satisfied.”
         Step 3: Identify Missing Parameters (If Any)
             - If **one or more required fields are missing** across both `query` and `conversation_summary`, the tool **cannot be invoked**.
             - Respond clearly, stating that the tool is **not selected**, and list the missing fields.Optional alternate phrasing:
@@ -703,10 +702,39 @@ While generating each data point, I must actively decide which required paramete
     > Always decide **tool selection status** based solely on the presence of **all required parameters**.
     > A single missing parameter invalidates invocation.
 
+- **CRITICAL GUIDELINES: The Three-Part Justification ( worker agent Selection)**
+
+**I. Isolate the Core Task Requirement – “Why it’s a special case”**
+    * Begin by identifying the **single most important requirement** that makes the query unique — in WORKER AGENT selection, this is whether the request contains **all required parameters** from the agents’s `payload_schema`.
+    * Clearly explain that the decision is **parameter-driven** and not based on general conversational interpretation.
+    * *Example:*
+      > “The core requirement here is to determine if the request contains every required field necessary for invoking the worker agent, making it a structured parameter validation task rather than an open-ended query.”
+
+- **II. Justify the Selection and Contrast with Alternatives – “Why it’s the only choice”**
+    * Explain why the chosen handler is **uniquely equipped** to meet the core requirement, making it the only appropriate agent for this request.
+    * If **all required fields are present** → State that the worker agent be invoked and why generic handlers would fail.
+    * If **one or more required fields are missing** → State that the agent is still the correct match in purpose but **cannot be invoked** due to missing invocation parameters. Explicitly list the missing parameters.
+    * Comparative language should make the contrast clear (“uniquely equipped,” “only handler specialized for,” “unlike generic models”).
+    * *Example (Invocation Ready):*
+      > “All required parameters are present, making this the only handler capable of fulfilling the request, unlike general-purpose models that lack API integration.”
+    * *Example (Missing Parameters):*
+      > “While this handler is the only one designed to retrieve Jira ticket details, it cannot be invoked because the `ticket_id` is missing — a strict requirement that general text-based agent do not enforce.”
+
+- **III. Provide Concrete Evidence – “Here’s the proof”**
+    * Cite **parameter evidence** from the `query` and `conversation_summary` to prove your decision is data-driven.
+    * List which required fields are present and which are missing, noting their source.
+    * *Example (Invocation Ready):*
+      > “The query contains `ticket_id` and `project_key`, and the conversation summary includes the `issue_type`, satisfying all requirements.”
+    * *Example (Missing Parameters):*
+      > “The query includes `project_key` but neither the query nor the conversation summary contains `ticket_id`, preventing full invocation readiness.”
+  
     -Agent Selected – Example 1 :
-      - All  invocation requirements  are present in the query or memory. The agent is successfully selected and invoked to generate the requested summary.
+        - The Jira_ticker Agent is selected as it uniquely matches the request for Jira ticket details, requiring all parameters (ticket_id, project_key, issue_type) to be present, which are fully provided in the query and conversation summary. Unlike other handlers lacking API-driven precision, this Agent ensures accurate ticket data retrieval through its specialized Jira integration.  
+
     -Agent Not Selected – Example 2 :
-        - Due to insufficient context, the system does not select or invoke any agent, and may instead ask a follow-up question to gather missing information.
+        - The Jira_ticker Agent is the ideal choice for fetching Jira ticket details due to its API-specific design, but it cannot be invoked as the required ticket_id is missing, despite project_key being provided. 
+
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.       
         
 7. chain_of_thought → Step-by-Step Reasoning 
 
@@ -787,19 +815,21 @@ While generating each data point, I must actively decide which required paramete
             "Since the `incident_id` is absent, the Worker Agent cannot be invoked, as all required parameters must be present.",
             "The system's confidence score of 0.72 reinforces the validity of this match, despite the incomplete inputs."
         ]
-        
-
     Example 2 (no any missing requiremtns):
+    
         [
         "Drawing from the conversation summary, I noted that the user is preparing for a firewall configuration update and has already submitted change request CR-3921 for the QA-07 environment.",
         "The query further specifies validating this change request using the compliance ruleset SEC-2025-Q2, indicating a clear intent to automate validation in the ITSM system.",
         "I searched the handler registry and confirmed that the `validate_change_request` Worker Agent is the best match, as it automates change request validation processes.",
-        "The agent's payload schema requires four fields: `change_request_id`, `environment_id`, `compliance_ruleset`, and `itsm_api_token`.",
+        "The agent's payload schema requires six fields: `change_request_id`, `environment_id`, `compliance_ruleset`, and `itsm_api_token`.",
         "The query provides `change_request_id` (CR-3921), `environment_id` (QA-07), and `compliance_ruleset` (SEC-2025-Q2), while the conversation summary confirms the availability of the `itsm_api_token`.",
         "I also observed that the optional parameter `validation_report_format` could be suggested to customize the output, though it’s not required.",
         "With all required fields fully provided across the query and summary, the Worker Agent is ready for invocation.",
         "The system's confidence score of 0.98 confirms the strong alignment and completeness of the inputs."
         ]
+
+- **Do not** include the user query or conversation summary as a quoted block in the conclusion.
+- **You must** include the exact same confidence value from `output.confidence` in the conclusion.
 
 
 ### How to Build Query and Conversation Memory
@@ -823,34 +853,34 @@ While generating each data point, I must actively decide which required paramete
     * Then generate the query and conversation summary **excluding any context related to the missing parameters**.
     * Again, you can enrich the query and summary with context related to **optional parameters**, as long as it doesn’t conflict with the missing required fields.
 
+- Note: The examples in this section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
 
-### Diverse User Queries + Conversation Memory
-    All queries are meant to trigger Worker Agents in an ITSM context.
+###  Diverse User Queries + Conversation Memory
+All queries are meant to trigger Worker Agents in an ITSM context.
 
-    - Variant 1 – Friendly Follow-up on Server Outage
-    - Query: "Hey, can you take a deeper look at the  model outage from this morning? I thought the restart fixed it, but we’re still seeing connection timeouts in the billing app. Might need to escalate."
-    -Conversation Memory: "User asked the incident agent to check PROD-23 due to a service interruption.The System reported a successful restart and system stabilization.user acknowledged it worked earlier but wanted to monitor further for any anomalies.The billing team just reported fresh timeouts post-restart. "
+- Variant 1 – Friendly Follow-up on Server Outage
+  - Query: "Hey, can you take a deeper look at the  model outage from this morning? I thought the restart fixed it, but we’re still seeing connection timeouts in the billing app. Might need to escalate."
+  -Conversation Memory: "User asked the incident agent to check PROD-23 due to a service interruption.The System reported a successful restart and system stabilization.user acknowledged it worked earlier but wanted to monitor further for any anomalies.The billing team just reported fresh timeouts post-restart. "
 
-    - Variant 2 – Deployment Window Validation
-    - Query:"Please confirm that CR-2458 has received final approval from InfoSec and compliance before our 6 PM deployment window today. We can’t proceed without the green light."
-    - Conversation Memory: "You submitted a Change Request CR-2458 last Monday for a scheduled firewall update.The request was pending InfoSec review and compliance sign-off.The deployment window is today at 6 PM sharp.You are waiting on approval before proceeding.
+- Variant 2 – Deployment Window Validation
+  - Query:"Please confirm that CR-2458 has received final approval from InfoSec and compliance before our 6 PM deployment window today. We can’t proceed without the green light."
+  - Conversation Memory: "You submitted a Change Request CR-2458 last Monday for a scheduled firewall update.The request was pending InfoSec review and compliance sign-off.The deployment window is today at 6 PM sharp..
 
-    - Variant 3 – Slightly Vague Monitoring Request
-    - Query: "Something's definitely off with the main DB in prod — we’re getting random lags during report generation. Could your monitoring assistant check if anything unusual popped up in the last 4 hours?"
-    - Conversation Memory: " user previously flagged high latency during batch report processing.No clear root cause was found during the last agent scan.Report generation is business-critical for daily reconciliation.user is now ticing sporadic lag again, especially this morning. "
+- Variant 3 – Slightly Vague Monitoring Request
+  - Query: "Something's definitely off with the main DB in prod — we’re getting random lags during report generation. Could your monitoring assistant check if anything unusual popped up in the last 4 hours?"
+  - Conversation Memory: " user previously flagged high latency during batch report processing.No clear root cause was found during the last agent scan.Report generation is business-critical for daily reconciliation.user ticed sporadic lag again, especially last night. "
 
-    - Variant 4 – Batch Uptime & SLA Report
-    - Query: "I need a weekly uptime and incident summary for DEV-02, QA-11, and PROD-44 — mainly focusing on any SLA breaches or escalations. We’re prepping for the ops review tomorrow."
-    -Conversation Memory: "You’ve been collecting operational metrics for the quarterly ITSM review.You already pulled ticket resolution times for QA-11.The ops team asked for uptime trends and SLA breaches across environments.This data is due by tomorrow's 9 AM review call. "
+- Variant 4 – Batch Uptime & SLA Report
+  - Query: "I need a weekly uptime and incident summary for DEV-02, QA-11, and PROD-44 — mainly focusing on any SLA breaches or escalations. We’re prepping for the ops review tomorrow."
+  -Conversation Memory: "User’ve been collecting operational metrics for the quarterly ITSM review.You already pulled ticket resolution times for QA-11.The ops team asked for uptime trends and SLA breaches across environments.This data is due by tomorrow's 9 AM review call. "
 
-    - Variant 5 – Clarification on Deployment Outcome
-    - Query: "Just to clarify — did the firewall config change from yesterday get deployed, and did it pass validation? Security was worried about the outbound rule exceptions."
-    - Conversation Memory: "You pushed a firewall config update yesterday at 7 PM.A change request was created, but validation results weren’t shared yet.InfoSec raised concerns about new outbound rules before the change.You now want to ensure the deployment was completed and validated. "
+- Variant 5 – Clarification on Deployment Outcome
+  - Query: "Just to clarify — did the firewall config change from yesterday get deployed, and did it pass validation? Security was worried about the outbound rule exceptions."
+  - Conversation Memory: "User pushed a firewall config update yesterday at 7 PM.A change request was created, but validation results weren’t shared yet.InfoSec raised concerns about new outbound rules before the change.You now want to ensure the deployment was completed and validated. "
 
-    Variant 6 – Unexplained Network Activity
-    -Query: "We got a bunch of failed pings to QA-03 overnight, but there’s no incident ticket. Could your system monitoring agent figure out if it was a temporary spike or something serious?"
-    -Conversation Memory: "You previously had intermittent issues on QA-03, which were unresolved.Overnight logs show multiple ICMP ping failures, but no alert was triggered.There’s concern this might be a silent failure or a monitoring gap.You’re relying on the monitoring agent to diagnose without formal ticket escalation. "
-
+Variant 6 – Unexplained Network Activity
+  -Query: "We got a bunch of failed pings to QA-03 overnight, but there’s no incident ticket. Could your system monitoring agent figure out if it was a temporary spike or something serious?"
+  -Conversation Memory: "You previously had intermittent issues on QA-03, which were unresolved.Overnight logs show multiple ICMP ping failures, but no alert was triggered.There’s concern this might be a silent failure or a monitoring gap.User’re relying on the monitoring agent to diagnose without formal ticket escalation. "
 
 ---
 ## Fields That Must Remain Unchanged
@@ -876,14 +906,15 @@ The following fields must be preserved exactly as they are. No changes, overwrit
 
 
 ## Strict Rule
+    - Note: The example prompts in each section are provided for guidance only. Do not replicate them in the exact same format — instead, use them as inspiration to create varied and diverse sentence structures. The goal is to produce new, original phrasing for each data point rather than repeating the examples verbatim.
     - IMPORTANT: Outside of the fields listed above, no other parts of the original input or output JSON should be altered. 
     - This ensures structural consistency and compatibility with downstream pipelines. The format, nesting, and extra fields must remain exactly as in the original INPUT_JSON.
-    - In Stage 1, generate an array of 4 distinct JSON items—each containing a unique combination of the required output fields. 
-    - Then, in Stage 2, iterate over these 4 items to replace the corresponding fields in the input JSON schema, producing a final output array of 4 fully merged JSON objects reflecting the updated input and output sections. 
+    - In Stage 1, generate an array of 6 distinct JSON items—each containing a unique combination of the required output fields. 
+    - Then, in Stage 2, iterate over these 6 items to replace the corresponding fields in the input JSON schema, producing a final output array of 6 fully merged JSON objects reflecting the updated input and output sections. 
     - Return final stage 2 output as following list of array
-        - [stage2_item1, stage2_iitem2, stage2_iitem3, stage2_iitem4].
+        - [stage2_item1, stage2_iitem2, stage2_iitem3,..... stage2_iitem6].
 
-- This marks the end of the prompt, and the final response should return this array of 4 complete JSON items."
+- This marks the end of the prompt, and the final response should return this array of 6 complete JSON items."
 
 
 """

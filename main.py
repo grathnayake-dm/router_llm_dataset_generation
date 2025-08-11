@@ -15,37 +15,37 @@ from data_validation.data_validation import DataValidator
 from add_handlers.add_handlers import HandlerRegistryExtender
 from utils.utils import save_handlers, load_registries, save_static_jsonl_files, merge_files
 
-# Configure logging to output to both file and console
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("pipeline.log"),
+        logging.FileHandler("pipeline.log"), 
         logging.StreamHandler() 
     ]
 )
 
 API_KEYS = {
-    "rag": "<ADD API KEY>",
-    "base_llm": "<ADD API KEY>",
-    "worker_agent": "<ADD API KEY>",
-    "mcp_tool": "<ADD API KEY>",
+    "base_llm": "AIzaSyCDIJ0SzNC3SqJDylSwNdUwWK9OXsom6_c",
+    "worker_agent": "AIzaSyDPPn9ZeJgJMOjwtS5zNk0V6rV1hNo4vyc",
+    "rag": "AIzaSyDeH_wnfSqW_EG9rXl0farmmIZaiswl6oM",
+    "mcp_tool": "AIzaSyAy3O2OIn-p0i8Gwctbud3o9mR2jEHkgQA",
 }
 
-def run_pipeline(handler_type: str, version: str, api_key: str):
+def run_pipeline(handler_type: str, version: str, api_key: str, dataset_size: int):
     try:
         logging.info(f"🚀 Starting pipeline for {handler_type}")
-
+        
         # Step 1: Registry
-        logging.info(f"[{handler_type}] 🔧 Step 1: Registry")
-        try:
+        try:            
+            hander_count_per_domain = dataset_size // 160
+            # hander_count_per_domain = 150
             builder = RegistryBuilder(api_key=api_key)
-            builder.build_registry(handler_type, version)
+            builder.build_registry(handler_type, version, hander_count_per_domain)
         except Exception as e:
             logging.error(f"[{handler_type}] ❌ Registry step failed: {e}")
             return
         time.sleep(30)
-
+        
         # Step 2: Static Fields
         logging.info(f"[{handler_type}] 📦 Step 2: Static Fields")
         try:
@@ -60,15 +60,15 @@ def run_pipeline(handler_type: str, version: str, api_key: str):
             logging.error(f"[{handler_type}] ❌ Static fields step failed: {e}")
             return
         time.sleep(30)
-
-        # Step 3: Contextual Fields
+        
+        Step 3: Contextual Fields
         logging.info(f"[{handler_type}] 🧠 Step 3: Contextual Fields")
         try:
             context_builder = ContextualFieldsBuilder(
                 api_key=api_key,
                 version=version,
                 handler_type=handler_type,
-                batch_size=200,
+                batch_size=150,
                 start_line=0,
                 end_line=None
             )
@@ -78,14 +78,14 @@ def run_pipeline(handler_type: str, version: str, api_key: str):
             return
         time.sleep(30)
         
-        # Step 4: Validation
+        # # Step 4: Validation
         logging.info(f"[{handler_type}] ✅ Step 4 : Validation")
         try:
             data_validator = DataValidator(
                 api_key=api_key,
                 version=version,
                 handler_type=handler_type,
-                batch_size=200,
+                batch_size=150,
                 start_line=0,
                 end_line=None
             )
@@ -99,7 +99,7 @@ def run_pipeline(handler_type: str, version: str, api_key: str):
         logging.info(f"[{handler_type}] 📚 Step 5: Append Handlers")
         try:
             extender = HandlerRegistryExtender(version=version, handler_type=handler_type)
-            extender.extend_single_jsonl()
+            extender.extend_single_jsonl( handler_type=handler_type)
         except Exception as e:
             logging.error(f"[{handler_type}] ❌ Append handlers step failed: {e}")
             return
@@ -120,15 +120,16 @@ def run_pipeline(handler_type: str, version: str, api_key: str):
 
 @click.command()
 @click.option('--version', required=True, help='Version label (e.g., 5)')
-def main(version):
+@click.option('--dataset_size', type=int, required=True, help='Size of the dataset to process (will be divided by 160 to set hander_count_per_domain)')
+def main(version, dataset_size):
     # "rag", "worker_agent", "base_llm", "mcp_tool"
-    handler_types = ["rag", "worker_agent", "base_llm",]
+    handler_types = ["rag", "worker_agent", "base_llm", "mcp_tool"]
     threads = []
 
     for handler in handler_types:
         api_key = API_KEYS.get(handler)
         t = threading.Thread(target=run_pipeline,
-                             args=(handler, version, api_key))
+                             args=(handler, version, api_key, dataset_size))
         t.start()
         threads.append(t)
 

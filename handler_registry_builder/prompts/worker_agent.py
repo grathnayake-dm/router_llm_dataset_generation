@@ -1,16 +1,21 @@
-WOKER_AGENT_PROMPT = """
+from string import Template
+
+WOKER_AGENT_PROMPT = Template("""
 
 You are a seasoned systems architect and domain expert tasked with designing a catalog of realistic and logically consistent worker agents for enterprise AI automation.
-you have to create 70 realistic worker agent catalog entries for the above given domain.
+you have to create `$count`  realistic worker agent catalog entries for the above given domain.
 
-Each worker agent should represent an autonomous, specialized component that performs a well-defined operational task in the  above given domai
+Each worker agent should represent an autonomous, specialized component that performs a well-defined operational task in the following given domain:
+
+## Domain
+**`$domain`**.
 
 ## Thought Process and Design Steps
   -Deeply Analyze the Domain:
     -Understand the domain’s workflows, typical operational tasks, and integration points for autonomous worker agents.
 
   -Identify Diverse Use Cases:
-  -Select 70 distinct and meaningful worker agent roles that naturally fit into the domain’s operational environment. Each must perform a unique function supporting automation, data processing, or system orchestration.
+  -Select `$count` distinct and meaningful worker agent roles that naturally fit into the domain’s operational environment. Each must perform a unique function supporting automation, data processing, or system orchestration.
 
   -Agent Role Conceptualization:
     -For each agent:
@@ -111,6 +116,8 @@ Woker_Agent (Object)
 
 - The name must clearly express the function in lowercase with underscores .
 - name should be unique across the all generated worker agents.
+- creative,  unique, never-before-heard names for AI agents.
+    - ex: Azura, Aplex
 
 
 ### Description Field 
@@ -175,7 +182,7 @@ Here’s the updated version for your **Worker Agent `payload_schema` design gui
 
 ### Output Format and Diversity
 
-* Generate exactly **70 diverse Worker Agents** for the given domain.
+* Generate exactly **`$count` diverse Worker Agents** for the given domain.
 * All Worker Agent attributes (`name`, `description`, `input_schema`) must be unique.
 * Avoid reusing or repeating payload schema structures across Worker Agents where possible, while respecting the field count strategy.
 * Worker Agent functionality and schema design must reflect realistic, domain-specific enterprise needs for **Business Intelligence and Analytics** tasks.
@@ -187,7 +194,7 @@ Here’s the updated version for your **Worker Agent `payload_schema` design gui
 * Study the example Worker Agent definitions carefully to understand field structure:
 ```json
 {  
-    "name": "ab_test_result_analyzer",
+    "name": "Azzela",
     "description": "Performs statistical analysis on A/B test results to determine a winning variant based on a primary conversion metric. The agent requires the unique experiment ID and the name of the primary metric to calculate statistical significance and declare a winner.",
     "http_endpoint": "https://optimizer.prod-tools.net/api/v1/experiments/analyze",
     "payload_schema": {
@@ -214,7 +221,7 @@ Here’s the updated version for your **Worker Agent `payload_schema` design gui
     "workspace_id": "c5d6e7f8-a9b0-4c1d-8e2f-3a4b5c6d7e8f"
 }
 {
-    "name": "accessibility_compliance_scanner",
+    "name": "accessibility_compliance_agent",
     "description": "Scans a UI design file or a live URL to ensure it meets specified accessibility standards (e.g., WCAG 2.1 AA). It identifies issues like insufficient color contrast, missing alt text, or improper ARIA roles. Requires the URL or design asset path and the target compliance level.",
     "http_endpoint": "https://a11y-checker.internal/api/v3/scan/webpage",
     "payload_schema": {
@@ -237,7 +244,7 @@ Here’s the updated version for your **Worker Agent `payload_schema` design gui
     "workspace_id": "d7e8f9a0-b1c2-4d3e-8f4a-5b6c7d8e9f0a"
 }
 {
-    "name": "feedback_theme_aggregator",
+    "name": "Ella",
     "description": "Collects and analyzes unstructured user feedback from multiple sources (e.g., app store reviews, support tickets, surveys) to identify and summarize key themes, sentiment, and feature requests. Requires a data source identifier and a date range for analysis.",
     "http_endpoint": "https://feedback-intel.io/api/v1/aggregate/themes",
     "payload_schema": {
@@ -295,16 +302,10 @@ this is not a part of the worker agent specification and should not be included 
 
 ### Final Output Requirement
 
-* Provide the output as a valid **JSON array** of **70 Worker Agent** objects for the Business Intelligence and Analytics domain.
+* Provide the output as a valid **JSON array** of **`$count` Worker Agent** objects for the Business Intelligence and Analytics domain.
 * The JSON must be well-formed and strictly follow the specified structure.
 
 ---
 
 
-
-
-
-
-
-
-"""
+""")

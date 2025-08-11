@@ -1,16 +1,21 @@
-MCP_TOOL_PROMPT = """
+from string import Template
+
+MCP_TOOL_PROMPT = Template("""
 
 You are an expert system designer tasked with designing realistic and logically sound MCP (Model Context Protocal) tools that perform a well-defined function in enterprise software.
 Each tool must be **distinct, purpose-driven**, and adhere to a standardized JSON structure for enterprise AI systems.
 
 
-Your task is to generate 75  JSON catalog for MCP based systems, specifically tailored to above given  domain.
+Your task is to generate `$count` JSON catalog for MCP based systems, specifically tailored  in the following given domain:
+
+## Domain
+**`$domain`**.
 
 
 ### Thought Process / Thinking Steps
     1. Understand the Given Domain: Begin by analyzing the provided domain to deeply understand its workflows,  and operational challenges.
 
-    2. you must study following Diverse sub areas on above selected domain and derive 75 distinct and realistic use cases to intergrate MPC tools that can logically occur within the scope of this  domain . 
+    2. you must study following Diverse sub areas on above selected domain and derive `$count` distinct and realistic use cases to intergrate MPC tools that can logically occur within the scope of this  domain . 
     Ensure that each use case represents a different functionality or process.          
 
     3. Create Unique MCP Tools:   
@@ -40,7 +45,7 @@ Your task is to generate 75  JSON catalog for MCP based systems, specifically ta
         - Be logical — if a parameter is critical to function execution, include it.
         - If it is helpful but not essential, **do not include it in the `required` list**, but still define it under `properties`.
 
-    5. Ensure Global Uniqueness: Across all 75 tools, confirm that names, descriptions, server names, and schema definitions are not reused or overlapping. Each tool must stand on its own in purpose and structure.
+    5. Ensure Global Uniqueness: Across all `$count` tools, confirm that names, descriptions, server names, and schema definitions are not reused or overlapping. Each tool must stand on its own in purpose and structure.
 
     6. Validate Realism and Relevance: Verify that each tool feels realistic and grounded in domain-specific language, challenges, and input expectations.
 
@@ -116,11 +121,16 @@ MCP_Tool (Object)
 
 ## Key Instructions
 
+
+
 ###  Tool Name and Server Name Format:
 - The MCP tool name must be in snake_case, clearly describing the tool’s specific function using domain-relevant terminology (e.g., patient_intake_tool for healthcare). It must be unique across all tools, distinct from the PascalCase server_name (e.g., PatientIntakeMCP), and avoid repetitive or unrelated names like edu_analytics_tool in non-education domains.
-- tool name must convince its is a mcp_tool
+-tailored to specific industries or use cases, often reflecting the domain they serve. Examples include:
+    - query_axiom_logs: Queries and analyzes logs in Axiom.
+    - baidu_map_query: Interacts with Baidu Maps APIs for location-based services.
+- tool name must convince its is a mcp_tool or creative never head of name also allowed
 - The server_name must follow PascalCase and typically ends in MCP, with a name that reflects the external platform or internal domain (e.g., GithubMCP, GoogleCalendarMCP). 
-- Both name and the server name should be unique across the all 75 tools.
+- Both name and the server name should be unique across the all `$count`  tools.
 - avoiding unrelated or repetitive names like EDuAnaltic, EduAssessMCP use differnt names sticking to the context of the domain.
 -
 
@@ -157,7 +167,7 @@ The description field must be a single valid  string, formatted as follows:
 
 ### 🔹 Output Format and Diversity
 
-* Generate **exactly 75 diverse mcp tools from a distinct domain.
+* Generate **exactly `$count`  diverse mcp tools from a distinct domain.
 * All tool attributes (`name`, `server_name`, `description`, input_schema) must be unique. 
 * Do not reuse or repeat input schema structures across tools.
 * Tool functionality and schema design must reflect realistic, domain-specific enterprise needs.
@@ -350,7 +360,6 @@ required field must never be defined inside input_schema.properties. It should a
 
 ## Final Output Requirement
 
-- Provide the output as a valid **JSON array** of **75 mpc tool objects** for the given domain).
+- Provide the output as a valid **JSON array** of **`$count`  mpc tool objects** for the given domain).
 - The JSON must be well-formed and adhere to the specified structure.
-"""
-
+""")

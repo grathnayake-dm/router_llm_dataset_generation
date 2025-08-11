@@ -1,397 +1,410 @@
 
-URBAN_MOBITLITY = """
+RETAIL_INVENTORY = """
+Retail Inventory Management
+Description: Retrieval-Augmented Generation (RAG) systems enhance retail inventory management by retrieving real-time product data, customer preferences, and supply chain insights to optimize stock levels, reduce waste, and improve customer satisfaction. Inspired by real-world racking systems like pallet racks and automated storage solutions.
+Subtasks
 
-## 1. Urban Mobility Optimization
-RAG systems retrieve traffic data, urban planning documents, and commuter feedback to generate strategies for efficient city transportation.
+Retrieve real-time stock levels to generate restocking alerts.
+Analyze sales data to recommend optimal shelf placements.
+Generate inventory turnover reports for slow-moving items.
+Retrieve supplier lead times to automate reorder schedules.
+Analyze customer purchase patterns for inventory forecasting.
+Generate product bundling suggestions based on sales trends.
+Retrieve warehouse space data to optimize storage layouts.
+Analyze seasonal demand to adjust inventory allocations.
+Generate low-stock alerts for high-demand products.
+Retrieve product return data to adjust inventory plans.
+Analyze competitor pricing to recommend stock adjustments.
+Generate inventory audit schedules based on stock value.
+Retrieve supplier reliability data to prioritize vendors.
+Analyze customer reviews to flag low-quality inventory items.
+Generate cross-store inventory transfer recommendations.
+Retrieve storage condition data to ensure product quality.
+Analyze inventory shrinkage patterns to detect theft risks.
+Generate dynamic pricing suggestions based on stock levels.
+Retrieve product lifecycle data to phase out obsolete items.
+Analyze warehouse traffic to optimize picking routes.
+Generate safety stock level recommendations for volatility.
+Retrieve regional sales data to balance inventory distribution.
+Analyze promotional campaign impacts on inventory needs.
+Generate inventory health dashboards for management.
+Retrieve product weight data to optimize racking layouts.
+Analyze customer demographics to tailor inventory mixes.
+Generate automated reorder forms for low-stock items.
+Retrieve recall data to remove defective products from stock.
+Analyze inventory aging to prioritize clearance sales.
+Generate real-time inventory tracking reports for audits.
 
-1. Retrieve real-time traffic data to optimize signal timings.
-2. Pull public transit schedules to generate commuter-friendly routes.
-3. Access urban planning reports to recommend bike lane expansions.
-4. Generate carpooling plans by retrieving commuter preference data.
-5. Retrieve accident reports to propose safer road designs.
-6. Pull mobility app feedback to improve user experience features.
-7. Access electric vehicle adoption data for charging station planning.
-8. Generate pedestrian flow models by retrieving foot traffic data.
-9. Retrieve ride-sharing data to optimize driver allocation.
-10. Pull city zoning laws to ensure transport project compliance.
-11. Access air quality data to promote low-emission transit options.
-12. Generate mobility impact reports by retrieving urban studies.
-13. Retrieve commuter survey data to tailor transport policies.
-14. Pull smart city sensor data for real-time traffic monitoring.
-15. Access public safety protocols for emergency transit plans.
-16. Generate accessibility guides by retrieving disability transport data.
-17. Retrieve historical congestion data to predict peak travel times.
-18. Pull transit funding guidelines for infrastructure proposals.
-19. Access autonomous vehicle regulations for deployment planning.
-20. Generate commuter education materials by retrieving transit FAQs.
-21. Retrieve weather data to adjust transport schedules dynamically.
-22. Pull urban mobility case studies for innovative solution ideas.
-23. Access parking sensor data to optimize parking availability.
-24. Generate transit safety reports by retrieving incident logs.
-25. Retrieve fare structure data to propose equitable pricing models.
-26. Pull community feedback for inclusive mobility initiatives.
-27. Access traffic simulation models for infrastructure planning.
-28. Generate multilingual transit guides by retrieving translations.
-29. Retrieve last-mile transport data to enhance connectivity plans.
-30. Pull mobility innovation trends for smart city strategy updates.
+"""
+HEALTHCARE_LOGISTICS = """
+Healthcare Logistics
+Description: RAG systems streamline healthcare logistics by retrieving medical supply data, patient needs, and regulatory requirements to ensure timely delivery and compliance. Inspired by specialized racking systems like medical-grade shelving and automated dispensing units.
+Subtasks
 
----
+Retrieve medical supply levels to generate restocking alerts.
+Analyze patient admission data to forecast supply needs.
+Generate delivery schedules for critical medical equipment.
+Retrieve regulatory compliance data for storage protocols.
+Analyze hospital usage trends to optimize supply allocation.
+Generate expiration date alerts for medical inventory.
+Retrieve supplier data to automate reorder processes.
+Analyze cold chain storage data for vaccine preservation.
+Generate equipment maintenance schedules from usage logs.
+Retrieve patient care data to prioritize supply deliveries.
+Analyze supply chain disruptions for contingency planning.
+Generate inventory audit reports for regulatory compliance.
+Retrieve sterilization records to ensure equipment safety.
+Analyze demand surges to adjust emergency stock levels.
+Generate supply distribution plans across hospital wings.
+Retrieve drug interaction data for safe inventory pairing.
+Analyze waste data to reduce expired medical supplies.
+Generate real-time tracking reports for critical supplies.
+Retrieve supplier certifications to ensure quality compliance.
+Analyze storage space data to optimize medical shelving.
+Generate automated order forms for high-priority items.
+Retrieve recall data to remove defective medical products.
+Analyze patient feedback to adjust supply quality checks.
+Generate supply chain efficiency reports for management.
+Retrieve temperature control logs for sensitive supplies.
+Analyze staff schedules to align supply delivery timing.
+Generate cross-facility supply transfer recommendations.
+Retrieve infection control data to adjust storage protocols.
+Analyze supply usage patterns to reduce overstocking.
+Generate compliance dashboards for healthcare regulators.
+
+"""
+E_COMMERCE_FULFILLMENT = """
+E-Commerce Fulfillment
+Description: RAG systems optimize e-commerce fulfillment by retrieving order data, warehouse logistics, and customer preferences to enhance order accuracy and delivery speed. Inspired by high-density racking systems like flow racks and automated retrieval systems.
+Subtasks
+
+Retrieve order data to generate picking lists for workers.
+Analyze customer order history for personalized packaging.
+Generate optimal warehouse picking routes from order data.
+Retrieve shipping carrier data to select cost-effective options.
+Analyze return rates to adjust fulfillment strategies.
+Generate real-time order tracking updates for customers.
+Retrieve inventory data to prevent overselling products.
+Analyze peak order times to optimize staffing schedules.
+Generate packaging material recommendations for efficiency.
+Retrieve customer location data for delivery time estimates.
+Analyze warehouse space for dynamic storage adjustments.
+Generate automated refund processing for return orders.
+Retrieve product weight data to optimize shipping costs.
+Analyze order errors to improve fulfillment accuracy.
+Generate batch order processing plans for efficiency.
+Retrieve customer feedback to enhance packaging quality.
+Analyze carrier performance for delivery reliability.
+Generate real-time inventory syncs across platforms.
+Retrieve product dimensions for optimal racking placement.
+Analyze seasonal order trends to adjust stock levels.
+Generate automated order confirmation messages.
+Retrieve customs data for international order compliance.
+Analyze return reasons to reduce future errors.
+Generate fulfillment cost reports for management.
+Retrieve warehouse traffic data to avoid bottlenecks.
+Analyze customer preferences for eco-friendly packaging.
+Generate automated reorder triggers for fast-moving items.
+Retrieve delivery failure data to improve logistics.
+Analyze order fulfillment times for process optimization.
+Generate customer satisfaction surveys post-fulfillment.
+
+"""
+MANUFACTURING_OPERATIONS = """
+Manufacturing Operations
+Description: RAG systems improve manufacturing operations by retrieving production data, equipment status, and supply chain insights to optimize efficiency and reduce downtime. Inspired by heavy-duty racking systems like cantilever racks and automated material handling.
+Subtasks
+
+Retrieve production schedules to generate task assignments.
+Analyze machine performance data for maintenance alerts.
+Generate material restocking plans from inventory levels.
+Retrieve quality control data to flag defective products.
+Analyze production line bottlenecks for process optimization.
+Generate equipment calibration schedules from usage logs.
+Retrieve supplier delivery data to align production plans.
+Analyze raw material usage for cost-saving strategies.
+Generate production downtime reports for analysis.
+Retrieve safety compliance data for equipment checks.
+Analyze worker productivity to optimize shift schedules.
+Generate material handling routes for warehouse efficiency.
+Retrieve defect rates to adjust production parameters.
+Analyze energy consumption for sustainable operations.
+Generate automated reorder forms for raw materials.
+Retrieve equipment failure logs for predictive maintenance.
+Analyze production output for quality assurance checks.
+Generate real-time production status dashboards.
+Retrieve regulatory data to ensure compliance in manufacturing.
+Analyze supply chain delays for contingency planning.
+Generate worker training schedules for new equipment.
+Retrieve material specifications for production accuracy.
+Analyze scrap rates to reduce material waste.
+Generate production capacity reports for planning.
+Retrieve environmental data for sustainable manufacturing.
+Analyze machine sensor data for performance optimization.
+Generate cross-facility material transfer plans.
+Retrieve product demand data to adjust production rates.
+Analyze quality feedback for process improvements.
+Generate automated safety audit checklists.
+
+"""
+FOOD_AND_BEVERAGE = """
+Food and Beverage Distribution
+Description: RAG systems enhance food and beverage distribution by retrieving supply chain data, storage conditions, and customer demand to ensure freshness and compliance. Inspired by refrigerated racking systems and automated cold storage solutions.
+Subtasks
+
+Retrieve inventory levels to generate restocking alerts.
+Analyze temperature logs to ensure food safety compliance.
+Generate delivery schedules for perishable goods.
+Retrieve supplier data to automate reorder processes.
+Analyze customer demand for inventory forecasting.
+Generate expiration date alerts for food products.
+Retrieve cold chain data to ensure product freshness.
+Analyze sales trends to optimize stock allocations.
+Generate food safety audit schedules from regulations.
+Retrieve recall data to remove unsafe products.
+Analyze storage space for efficient racking layouts.
+Generate automated order forms for high-demand items.
+Retrieve dietary compliance data for product labeling.
+Analyze waste data to reduce spoiled inventory.
+Generate real-time tracking reports for deliveries.
+Retrieve supplier certifications for quality assurance.
+Analyze seasonal demand to adjust stock levels.
+Generate cross-warehouse transfer plans for balance.
+Retrieve packaging data to ensure product integrity.
+Analyze customer feedback to improve product quality.
+Generate delivery route optimizations for freshness.
+Retrieve regulatory data for food safety compliance.
+Analyze inventory turnover for cost efficiency.
+Generate food allergen alerts for customer safety.
+Retrieve transport data to monitor delivery conditions.
+Analyze order patterns for promotional planning.
+Generate inventory health dashboards for management.
+Retrieve product origin data for traceability reports.
+Analyze spoilage patterns to adjust storage protocols.
+Generate automated compliance reports for regulators.
+
+"""
+AUTOMOTIVE_PARTS = """
+Automotive Parts Management
+Description: RAG systems streamline automotive parts management by retrieving inventory data, repair schedules, and supplier information to optimize availability and reduce delays. Inspired by tire racks and specialized automotive racking systems.
+Subtasks
+
+Retrieve parts inventory to generate restocking alerts.
+Analyze repair shop demand for parts forecasting.
+Generate parts delivery schedules for repair centers.
+Retrieve supplier data to automate reorder processes.
+Analyze parts usage trends for inventory optimization.
+Generate warranty claim reports from parts data.
+Retrieve storage condition data to ensure parts quality.
+Analyze parts return rates to adjust stock levels.
+Generate real-time parts availability updates.
+Retrieve compatibility data for accurate parts matching.
+Analyze warehouse space for efficient racking layouts.
+Generate automated order forms for high-demand parts.
+Retrieve recall data to remove defective parts.
+Analyze parts obsolescence for inventory clearance.
+Generate parts pricing suggestions based on demand.
+Retrieve supplier reliability data for vendor selection.
+Analyze repair schedules to prioritize parts stock.
+Generate cross-warehouse parts transfer plans.
+Retrieve parts weight data to optimize storage racks.
+Analyze customer feedback to improve parts quality.
+Generate automated parts audit schedules.
+Retrieve regulatory data for parts compliance.
+Analyze parts failure rates for quality checks.
+Generate real-time parts tracking dashboards.
+Retrieve shipping data to optimize delivery routes.
+Analyze seasonal repair trends for parts stocking.
+Generate parts bundling suggestions for promotions.
+Retrieve environmental data for sustainable storage.
+Analyze parts inventory turnover for cost efficiency.
+Generate automated safety inspection checklists.
+
+"""
+CONSTRUCTION_MATERIALS = """
+Construction Materials Management
+Description: RAG systems optimize construction materials management by retrieving project data, supplier information, and site requirements to ensure timely delivery and efficient storage. Inspired by cantilever racking systems for heavy materials.
+Subtasks
+
+Retrieve material inventory to generate restocking alerts.
+Analyze project schedules for material delivery planning.
+Generate storage layout plans for construction sites.
+Retrieve supplier data to automate reorder processes.
+Analyze material usage trends for inventory forecasting.
+Generate material safety compliance reports.
+Retrieve site storage data to optimize racking layouts.
+Analyze project delays to adjust material orders.
+Generate real-time material availability updates.
+Retrieve material specifications for project accuracy.
+Analyze waste data to reduce material overstocking.
+Generate automated order forms for critical materials.
+Retrieve regulatory data for material compliance.
+Analyze supplier performance for reliable deliveries.
+Generate material delivery route optimizations.
+Retrieve environmental data for sustainable storage.
+Analyze project budgets for material cost savings.
+Generate cross-site material transfer plans.
+Retrieve material weight data for racking safety.
+Analyze construction timelines for material prioritization.
+Generate automated material audit schedules.
+Retrieve quality control data to flag defective materials.
+Analyze material demand for seasonal adjustments.
+Generate real-time material tracking dashboards.
+Retrieve weather data to adjust material storage plans.
+Analyze site safety data for material handling protocols.
+Generate material bundling suggestions for projects.
+Retrieve supplier certifications for quality assurance.
+Analyze material lifecycle data for sustainability.
+Generate compliance reports for construction regulators.
+
+"""
+PHARMACEUTICAL_LOGISTICS = """
+Pharmaceutical Logistics
+Description: RAG systems enhance pharmaceutical logistics by retrieving drug inventory data, regulatory requirements, and patient needs to ensure safe and timely delivery. Inspired by automated storage systems for sensitive pharmaceuticals.
+Subtasks
+
+Retrieve drug inventory to generate restocking alerts.
+Analyze prescription data for demand forecasting.
+Generate delivery schedules for time-sensitive drugs.
+Retrieve regulatory data for storage compliance.
+Analyze cold chain data to ensure drug efficacy.
+Generate expiration date alerts for pharmaceuticals.
+Retrieve supplier data to automate reorder processes.
+Analyze patient demand for inventory optimization.
+Generate drug safety audit schedules from regulations.
+Retrieve recall data to remove defective drugs.
+Analyze storage conditions for drug preservation.
+Generate automated order forms for critical drugs.
+Retrieve drug interaction data for safe distribution.
+Analyze waste data to reduce expired drugs.
+Generate real-time drug tracking reports.
+Retrieve supplier certifications for quality assurance.
+Analyze seasonal demand to adjust drug stock levels.
+Generate cross-pharmacy drug transfer plans.
+Retrieve drug weight data for storage optimization.
+Analyze patient feedback to improve drug quality.
+Generate automated compliance reports for regulators.
+Retrieve temperature logs for sensitive drug storage.
+Analyze drug usage patterns for cost efficiency.
+Generate drug authenticity verification reports.
+Retrieve transport data to monitor delivery conditions.
+Analyze prescription trends for promotional planning.
+Generate drug inventory health dashboards.
+Retrieve drug origin data for traceability reports.
+Analyze spoilage patterns to adjust storage protocols.
+Generate patient safety alerts for drug recalls.
+
+"""
+LIBRARY_ARCHIVES = """
+Library and Archives Management
+Description: RAG systems streamline library and archives management by retrieving catalog data, user preferences, and preservation requirements to enhance access and organization. Inspired by high-density mobile shelving systems.
+Subtasks
+
+Retrieve book inventory to generate restocking alerts.
+Analyze borrowing patterns for collection optimization.
+Generate catalog updates from new acquisitions.
+Retrieve preservation data for archival storage protocols.
+Analyze user preferences for book recommendation lists.
+Generate overdue book reminder notifications.
+Retrieve digital archive data for user access links.
+Analyze library traffic for shelving layout optimization.
+Generate automated cataloging tasks for new items.
+Retrieve rare book data for special handling protocols.
+Analyze reservation data to prioritize book availability.
+Generate library event schedules from user interests.
+Retrieve metadata to enhance search accuracy.
+Analyze book condition data for repair prioritization.
+Generate real-time book availability updates.
+Retrieve user feedback to improve collection quality.
+Analyze interlibrary loan data for resource sharing.
+Generate automated fine calculation reports.
+Retrieve storage space data for shelving adjustments.
+Analyze seasonal borrowing trends for stock planning.
+Generate digital archive access reports for users.
+Retrieve copyright data for restricted materials.
+Analyze user demographics for collection tailoring.
+Generate library maintenance schedules for shelves.
+Retrieve environmental data for archive preservation.
+Analyze book usage for weeding outdated items.
+Generate automated user survey forms for feedback.
+Retrieve digitization status for archive access plans.
+Analyze library program attendance for event planning.
+Generate compliance reports for archival standards.
+
+"""
+FASHION_RETAIL = """
+Fashion Retail Inventory
+Description: RAG systems optimize fashion retail inventory by retrieving product data, customer trends, and seasonal demands to ensure stock relevance and sales efficiency. Inspired by garment racking systems and automated retail storage.
+Subtasks
+
+Retrieve inventory levels to generate restocking alerts.
+Analyze sales trends for fashion item prioritization.
+Generate seasonal collection stocking plans.
+Retrieve supplier data to automate reorder processes.
+Analyze customer preferences for inventory curation.
+Generate size availability alerts for popular items.
+Retrieve storage condition data for fabric preservation.
+Analyze return rates to adjust inventory quality.
+Generate real-time stock availability updates.
+Retrieve trend data for new collection planning.
+Analyze warehouse space for racking optimization.
+Generate automated order forms for fast-moving items.
+Retrieve product material data for quality checks.
+Analyze customer feedback to improve stock quality.
+Generate cross-store inventory transfer plans.
+Retrieve fashion show data for trend forecasting.
+Analyze seasonal sales for inventory adjustments.
+Generate dynamic pricing suggestions for slow items.
+Retrieve product weight data for storage efficiency.
+Analyze social media trends for inventory relevance.
+Generate automated restocking schedules for events.
+Retrieve return policy data for customer compliance.
+Analyze inventory turnover for cost efficiency.
+Generate fashion inventory health dashboards.
+Retrieve supplier sustainability data for eco-friendly stock.
+Analyze customer demographics for targeted collections.
+Generate promotional campaign plans from trends.
+Retrieve product defect data to adjust stock levels.
+Analyze store traffic for shelving layout optimization.
+Generate automated inventory audit reports.
+
+"""
+DATA_CENTER_STORAGE = """
+Data Center Storage Management
+Description: RAG systems enhance data center storage management by retrieving equipment data, maintenance schedules, and capacity needs to optimize performance and uptime. Inspired by high-density server racking systems and automated data center solutions.
+Subtasks
+
+Retrieve server inventory to generate replacement alerts.
+Analyze equipment performance for maintenance planning.
+Generate cooling system schedules from temperature data.
+Retrieve supplier data to automate hardware orders.
+Analyze server usage for capacity optimization.
+Generate downtime alerts for critical equipment.
+Retrieve rack space data for layout optimization.
+Analyze power consumption for energy efficiency.
+Generate automated maintenance schedules for servers.
+Retrieve warranty data for equipment replacements.
+Analyze data center traffic for load balancing.
+Generate real-time equipment status dashboards.
+Retrieve environmental data for cooling adjustments.
+Analyze failure rates to predict maintenance needs.
+Generate automated order forms for spare parts.
+Retrieve compliance data for regulatory audits.
+Analyze server health for performance optimization.
+Generate cross-center equipment transfer plans.
+Retrieve equipment weight data for rack safety.
+Analyze uptime data for reliability improvements.
+Generate automated safety inspection checklists.
+Retrieve vendor performance data for reliable sourcing.
+Analyze energy trends for sustainable operations.
+Generate equipment lifecycle reports for budgeting.
+Retrieve security data for access control protocols.
+Analyze hardware compatibility for upgrade planning.
+Generate automated audit reports for compliance.
+Retrieve cooling system logs for efficiency checks.
+Analyze server load for capacity expansion plans.
+Generate real-time data center health dashboards.
 
 """
 
-
-DIGITAL_HERIATEGE = """
-## Digital Heritage Archiving
-RAG systems retrieve historical records, cultural databases, and digitization protocols to generate accessible digital archives and educational content.
-
-1. Retrieve historical texts to create digital archive entries.
-2. Pull artifact metadata to generate museum catalog summaries.
-3. Access digitization standards for high-quality archive scans.
-4. Generate virtual exhibit scripts by retrieving cultural narratives.
-5. Retrieve oral history transcripts for public access summaries.
-6. Pull archival preservation protocols to ensure data integrity.
-7. Access cultural grant data for archive funding proposals.
-8. Generate educational content by retrieving heritage studies.
-9. Retrieve manuscript images for text recognition processing.
-10. Pull historical event records for timeline visualizations.
-11. Access copyright laws for digital archive compliance.
-12. Generate archive access guides by retrieving user FAQs.
-13. Retrieve restoration techniques for damaged artifact records.
-14. Pull community feedback to prioritize archive digitization.
-15. Access multilingual resources for translated archive content.
-16. Generate heritage preservation reports by retrieving case studies.
-17. Retrieve 3D scanning protocols for artifact digitization.
-18. Pull historical map data for geographic archive entries.
-19. Access public domain records for open-access archiving.
-20. Generate virtual tour scripts by retrieving site histories.
-21. Retrieve archival funding trends for budget planning.
-22. Pull cultural significance studies for prioritized archiving.
-23. Access metadata standards for consistent archive formatting.
-24. Generate archive promotion materials by retrieving social media trends.
-25. Retrieve historical photo collections for digital galleries.
-26. Pull conservation guidelines for long-term archive storage.
-27. Access community heritage data for inclusive archive projects.
-28. Generate archive search interfaces by retrieving user needs.
-29. Retrieve digital preservation case studies for best practices.
-30. Pull historical audio records for transcription and archiving.
-
----
-
-"""
-
-
-WASTE_MANGMENT = """
-
-## Smart Waste Management
-RAG systems retrieve waste management data, recycling protocols, and environmental regulations to generate efficient waste handling strategies.
-
-1. Retrieve waste generation data to optimize collection schedules.
-2. Pull recycling protocols to generate sorting guidelines.
-3. Access landfill capacity data for waste diversion planning.
-4. Generate public education campaigns by retrieving waste FAQs.
-5. Retrieve hazardous waste regulations for safe disposal plans.
-6. Pull sensor data to monitor bin fill levels in real-time.
-7. Access composting techniques for organic waste strategies.
-8. Generate waste audit reports by retrieving facility data.
-9. Retrieve recycling market trends for material resale plans.
-10. Pull environmental impact studies for sustainable waste policies.
-11. Access waste-to-energy technologies for innovation proposals.
-12. Generate waste reduction plans by retrieving consumption data.
-13. Retrieve local ordinances for waste management compliance.
-14. Pull community feedback to improve waste program adoption.
-15. Access waste tracking data for supply chain transparency.
-16. Generate recycling workshop materials by retrieving guides.
-17. Retrieve waste composition studies for recycling optimization.
-18. Pull smart bin technology specs for deployment planning.
-19. Access funding opportunities for waste management projects.
-20. Generate waste diversion reports by retrieving metrics.
-21. Retrieve illegal dumping data for enforcement strategies.
-22. Pull biodegradable material studies for packaging recommendations.
-23. Access waste collection logistics for route optimization.
-24. Generate multilingual waste guides by retrieving translations.
-25. Retrieve circular economy models for waste reduction plans.
-26. Pull public health data for waste-related risk assessments.
-27. Access waste management case studies for best practices.
-28. Generate community cleanup plans by retrieving volunteer data.
-29. Retrieve e-waste recycling protocols for tech disposal plans.
-30. Pull waste policy updates for regulatory compliance.
-
----
-
-"""
-
-
-DESIGNING = """
-## Green Building Design
-RAG systems retrieve architectural standards, sustainability metrics, and material data to generate eco-friendly building designs and certifications.
-
-1. Retrieve green building standards for LEED certification plans.
-2. Pull material sustainability data to recommend eco-friendly options.
-3. Access energy efficiency studies for building design optimization.
-4. Generate construction budgets by retrieving cost data.
-5. Retrieve building code regulations for compliance planning.
-6. Pull daylighting studies for natural lighting designs.
-7. Access water conservation techniques for plumbing plans.
-8. Generate energy modeling reports by retrieving simulation data.
-9. Retrieve renewable energy specs for solar integration plans.
-10. Pull occupant feedback for user-centric design improvements.
-11. Access green roof studies for rooftop garden designs.
-12. Generate sustainability reports by retrieving environmental data.
-13. Retrieve HVAC efficiency standards for system recommendations.
-14. Pull construction waste management protocols for recycling plans.
-15. Access urban heat island studies for cooling strategies.
-16. Generate accessibility designs by retrieving disability standards.
-17. Retrieve smart building tech specs for automation planning.
-18. Pull funding opportunities for green building projects.
-19. Access thermal insulation studies for energy-efficient designs.
-20. Generate public education materials on green building benefits.
-21. Retrieve air quality standards for ventilation system plans.
-22. Pull sustainable landscaping guidelines for outdoor designs.
-23. Access green certification case studies for project inspiration.
-24. Generate building maintenance schedules by retrieving manuals.
-25. Retrieve occupant health studies for wellness-focused designs.
-26. Pull retrofit technologies for existing building upgrades.
-27. Access building lifecycle data for long-term sustainability plans.
-28. Generate stakeholder presentations by retrieving project metrics.
-29. Retrieve noise reduction studies for acoustic design plans.
-30. Pull green building policy updates for regulatory compliance.
-
----
-
-"""
-HEALTH_MONITORING = """
-## Community Health Monitoring
-RAG systems retrieve public health data, medical guidelines, and community feedback to generate health monitoring programs and alerts.
-
-1. Retrieve health survey data to identify community health trends.
-2. Pull medical guidelines for disease prevention campaigns.
-3. Access vaccination records for immunization tracking.
-4. Generate health alert messages by retrieving outbreak data.
-5. Retrieve air quality data for respiratory health warnings.
-6. Pull community feedback to tailor health programs.
-7. Access nutrition guidelines for community diet plans.
-8. Generate mental health resources by retrieving support guides.
-9. Retrieve fitness program data for community exercise plans.
-10. Pull health equity studies for inclusive program designs.
-11. Access water quality data for contamination alerts.
-12. Generate health education materials by retrieving FAQs.
-13. Retrieve chronic disease statistics for targeted interventions.
-14. Pull local health policies for compliance planning.
-15. Access telemedicine protocols for remote health monitoring.
-16. Generate community wellness reports by retrieving metrics.
-17. Retrieve health funding opportunities for program proposals.
-18. Pull environmental health studies for risk assessments.
-19. Access youth health data for school-based wellness plans.
-20. Generate multilingual health guides by retrieving translations.
-21. Retrieve mental health crisis protocols for emergency plans.
-22. Pull community health event data for engagement schedules.
-23. Access health technology specs for monitoring device integration.
-24. Generate health campaign scripts by retrieving marketing data.
-25. Retrieve social determinant data for health disparity plans.
-26. Pull public health case studies for program inspiration.
-27. Access health insurance data for coverage education.
-28. Generate health workshop plans by retrieving training materials.
-29. Retrieve epidemic response protocols for preparedness plans.
-30. Pull community health feedback for program refinements.
-
----
-
-"""
-LOGISTIC_COORDINATION = """
-
-## Autonomous Logistics Coordination
-RAG systems retrieve logistics data, regulatory guidelines, and vehicle telemetry to generate optimized autonomous transport strategies.
-
-1. Retrieve traffic data for autonomous vehicle route planning.
-2. Pull regulatory guidelines for autonomous transport compliance.
-3. Access vehicle telemetry data for real-time performance monitoring.
-4. Generate delivery schedules by retrieving logistics data.
-5. Retrieve warehouse inventory data for optimized dispatching.
-6. Pull weather forecasts for autonomous vehicle safety plans.
-7. Access road condition data for route optimization.
-8. Generate fuel efficiency reports by retrieving vehicle data.
-9. Retrieve driverless tech specs for system upgrades.
-10. Pull supply chain data for end-to-end logistics planning.
-11. Access safety protocols for autonomous vehicle operations.
-12. Generate logistics cost analyses by retrieving expense data.
-13. Retrieve real-time GPS data for dynamic rerouting.
-14. Pull autonomous vehicle case studies for best practices.
-15. Access traffic law updates for regulatory compliance.
-16. Generate driver training materials for semi-autonomous systems.
-17. Retrieve accident data for safety improvement plans.
-18. Pull logistics funding opportunities for project proposals.
-19. Access sensor data for autonomous vehicle diagnostics.
-20. Generate stakeholder reports by retrieving logistics metrics.
-21. Retrieve freight demand forecasts for capacity planning.
-22. Pull autonomous tech patents for innovation insights.
-23. Access environmental impact data for green logistics plans.
-24. Generate multilingual logistics guides by retrieving translations.
-25. Retrieve last-mile delivery data for efficiency strategies.
-26. Pull community feedback for autonomous transport acceptance.
-27. Access vehicle maintenance schedules for uptime planning.
-28. Generate logistics safety reports by retrieving incident logs.
-29. Retrieve urban mobility data for city logistics integration.
-30. Pull smart logistics trends for future-proofing strategies.
-
----
-"""
-CITIZEN_SCIENCE_COOORDINATION = """
-
-## Citizen Science Coordination
-RAG systems retrieve scientific protocols, public datasets, and participant feedback to generate citizen science project plans and analyses.
-
-1. Retrieve scientific protocols for citizen science project designs.
-2. Pull public datasets for community data collection tasks.
-3. Access participant feedback to improve project engagement.
-4. Generate project guides by retrieving citizen science FAQs.
-5. Retrieve environmental data for community monitoring tasks.
-6. Pull citizen science case studies for project inspiration.
-7. Access funding opportunities for citizen science initiatives.
-8. Generate data collection templates by retrieving protocols.
-9. Retrieve biodiversity records for wildlife monitoring projects.
-10. Pull community education resources for science outreach.
-11. Access data analysis tools for citizen scientist training.
-12. Generate project progress reports by retrieving contributions.
-13. Retrieve ethical research guidelines for participant safety.
-14. Pull public health data for community health projects.
-15. Access citizen science platforms for collaboration planning.
-16. Generate multilingual project guides by retrieving translations.
-17. Retrieve participant demographic data for inclusive designs.
-18. Pull scientific literature for project background summaries.
-19. Access data privacy laws for participant data compliance.
-20. Generate public outreach materials by retrieving trends.
-21. Retrieve weather data for outdoor project scheduling.
-22. Pull community feedback for project refinement plans.
-23. Access open-access datasets for cross-project comparisons.
-24. Generate citizen science dashboards by retrieving metrics.
-25. Retrieve volunteer coordination protocols for team management.
-26. Pull scientific method guides for participant training.
-27. Access project impact studies for funding justifications.
-28. Generate data visualization guides by retrieving tools.
-29. Retrieve citizen science success stories for promotion.
-30. Pull regulatory guidelines for community project compliance.
-
----
-
-
-"""
-
-
-RETAIL_ANALYTICS = """
-
-## Smart Retail Analytics
-RAG systems retrieve sales data, customer feedback, and market trends to generate retail strategies and personalized shopping experiences.
-
-1. Retrieve sales data to generate store performance reports.
-2. Pull customer feedback for product preference insights.
-3. Access market trends to recommend inventory stocking.
-4. Generate personalized promotions by retrieving purchase histories.
-5. Retrieve competitor pricing data for competitive strategies.
-6. Pull store layout studies for customer flow optimization.
-7. Access loyalty program data for customer retention plans.
-8. Generate sales forecasts by retrieving historical data.
-9. Retrieve product review data for quality improvement plans.
-10. Pull in-store sensor data for real-time foot traffic analysis.
-11. Access marketing campaign data for ROI evaluations.
-12. Generate store staffing schedules by retrieving sales patterns.
-13. Retrieve product recall data for safety compliance plans.
-14. Pull customer demographic data for targeted promotions.
-15. Access retail tech specs for smart shelf integrations.
-16. Generate customer service scripts by retrieving FAQs.
-17. Retrieve supply chain data for inventory restocking plans.
-18. Pull retail case studies for operational best practices.
-19. Access promotional event data for sales boost planning.
-20. Generate multilingual retail guides by retrieving translations.
-21. Retrieve loss prevention data for theft reduction strategies.
-22. Pull customer sentiment analysis for brand perception insights.
-23. Access store accessibility standards for inclusive designs.
-24. Generate retail training materials by retrieving guides.
-25. Retrieve competitor marketing data for campaign inspiration.
-26. Pull in-store safety protocols for compliance planning.
-27. Access retail funding opportunities for expansion proposals.
-28. Generate customer engagement plans by retrieving trends.
-29. Retrieve product lifecycle data for inventory management.
-30. Pull smart retail trends for technology adoption strategies.
-
----
-
-"""
-ENVIRONMENT_POLICY = """
-## Environmental Policy Advocacy
-RAG systems retrieve environmental studies, policy documents, and public feedback to generate advocacy strategies and policy recommendations.
-
-1. Retrieve climate studies for evidence-based policy proposals.
-2. Pull environmental regulations for compliance advocacy.
-3. Access public feedback for community-driven policy support.
-4. Generate advocacy campaign scripts by retrieving templates.
-5. Retrieve renewable energy data for policy justifications.
-6. Pull pollution studies for air quality advocacy plans.
-7. Access environmental grant data for funding proposals.
-8. Generate policy briefs by retrieving scientific reports.
-9. Retrieve biodiversity loss data for conservation advocacy.
-10. Pull stakeholder feedback for inclusive policy designs.
-11. Access carbon emission data for climate policy recommendations.
-12. Generate public education materials by retrieving FAQs.
-13. Retrieve environmental law updates for advocacy compliance.
-14. Pull community health data for environmental impact advocacy.
-15. Access policy case studies for successful advocacy strategies.
-16. Generate multilingual policy guides by retrieving translations.
-17. Retrieve environmental justice data for equitable policies.
-18. Pull regulatory impact studies for policy evaluations.
-19. Access public protest data for advocacy event planning.
-20. Generate stakeholder presentations by retrieving metrics.
-21. Retrieve green technology data for innovation advocacy.
-22. Pull environmental funding trends for budget planning.
-23. Access climate adaptation studies for resilience policies.
-24. Generate advocacy training materials by retrieving guides.
-25. Retrieve environmental violation data for enforcement advocacy.
-26. Pull social media trends for environmental campaign boosts.
-27. Access international treaties for global policy alignment.
-28. Generate policy impact reports by retrieving data.
-29. Retrieve community engagement data for advocacy outreach.
-30. Pull environmental policy success stories for inspiration.
-
----
-
-"""
-
-EVENT_PRODUCTION = """
-## Virtual Event Production
-RAG systems retrieve event templates, audience data, and platform specifications to generate virtual event plans and engagement strategies.
-
-1. Retrieve virtual event templates for production planning.
-2. Pull audience feedback to optimize event engagement.
-3. Access platform specs for virtual event compatibility.
-4. Generate event scripts by retrieving content templates.
-5. Retrieve attendee demographic data for targeted promotions.
-6. Pull virtual event case studies for best practice insights.
-7. Access funding opportunities for virtual event budgets.
-8. Generate event schedules by retrieving platform data.
-9. Retrieve accessibility standards for inclusive event designs.
-10. Pull social media trends for event marketing strategies.
-11. Access virtual event tech specs for platform integrations.
-12. Generate attendee guides by retrieving event FAQs.
-13. Retrieve speaker bios for event promotion materials.
-14. Pull virtual event metrics for performance evaluations.
-15. Access multilingual resources for translated event content.
-16. Generate event safety protocols by retrieving guidelines.
-17. Retrieve virtual event feedback for post-event refinements.
-18. Pull streaming platform data for broadcast optimization.
-19. Access virtual event law updates for compliance planning.
-20. Generate sponsorship proposals by retrieving funding data.
-21. Retrieve audience engagement data for interactive features.
-22. Pull virtual event case studies for innovative formats.
-23. Access event promotion templates for marketing campaigns.
-24. Generate virtual event dashboards by retrieving metrics.
-25. Retrieve attendee interaction data for dynamic content plans.
-26. Pull virtual event accessibility data for inclusive features.
-27. Access speaker training guides for virtual presentation plans.
-28. Generate event replay scripts by retrieving session data.
-29. Retrieve virtual event platform reviews for tool selection.
-30. Pull audience sentiment analysis for event improvement plans.
-
----
-"""
-
-
-__all__= ["EVENT_PRODUCTION", "ENVIRONMENT_POLICY", "RETAIL_ANALYTICS", "CITIZEN_SCIENCE_COOORDINATION", "LOGISTIC_COORDINATION", "HEALTH_MONITORING", "DESIGNING", "WASTE_MANGMENT", "DIGITAL_HERIATEGE", "URBAN_MOBITLITY"]
+__all__= ["RETAIL_INVENTORY", "HEALTHCARE_LOGISTICS", "E_COMMERCE_FULFILLMENT", "MANUFACTURING_OPERATIONS", "FOOD_AND_BEVERAGE", "AUTOMOTIVE_PARTS", "CONSTRUCTION_MATERIALS", "PHARMACEUTICAL_LOGISTICS", "LIBRARY_ARCHIVES", "FASHION_RETAIL", "DATA_CENTER_STORAGE"]
